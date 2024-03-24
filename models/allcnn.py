@@ -1,12 +1,26 @@
 # Implementation taken from https://github.com/StefOe/all-conv-pytorch/blob/master/allconv.py
-# This is the All-Conv-C model. 
+# This is the All-Conv-C model.
 import torch.nn as nn
 import torch.nn.functional as F
+import torch
+
 
 class AllConvNet(nn.Module):
-    def __init__(self, input_size, n_classes=10, **kwargs):
+    def __init__(self, in_channels=3, n_classes=10):
+        """
+        Instantiate a All convolution neural network.
+
+        Parameters
+        ----------
+        in_channels: int, default to 3.
+            Number of channels in the input image. For CIFAR-10, this
+            parameter is 3. Defaults to 3.
+        n_classes: int, default to 10.
+            Number of classes. For CIFAR-10, this parameter is
+            10. Defaults to 10.
+        """
         super(AllConvNet, self).__init__()
-        self.conv1 = nn.Conv2d(input_size, 96, 3, padding=1)
+        self.conv1 = nn.Conv2d(in_channels, 96, 3, padding=1)
         self.conv2 = nn.Conv2d(96, 96, 3, padding=1)
         self.conv3 = nn.Conv2d(96, 96, 3, padding=1, stride=2)
         self.conv4 = nn.Conv2d(96, 192, 3, padding=1)
@@ -17,17 +31,16 @@ class AllConvNet(nn.Module):
 
         self.class_conv = nn.Conv2d(192, n_classes, 1)
 
-
-    def forward(self, x):
-        x_drop = F.dropout(x, .2)
+    def forward(self, x: torch.Tensor):
+        x_drop = F.dropout(x, 0.2)
         conv1_out = F.relu(self.conv1(x_drop))
         conv2_out = F.relu(self.conv2(conv1_out))
         conv3_out = F.relu(self.conv3(conv2_out))
-        conv3_out_drop = F.dropout(conv3_out, .5)
+        conv3_out_drop = F.dropout(conv3_out, 0.5)
         conv4_out = F.relu(self.conv4(conv3_out_drop))
         conv5_out = F.relu(self.conv5(conv4_out))
         conv6_out = F.relu(self.conv6(conv5_out))
-        conv6_out_drop = F.dropout(conv6_out, .5)
+        conv6_out_drop = F.dropout(conv6_out, 0.5)
         conv7_out = F.relu(self.conv7(conv6_out_drop))
         conv8_out = F.relu(self.conv8(conv7_out))
 
