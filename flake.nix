@@ -47,6 +47,7 @@
             pythonPackages.virtualenv
             nodePackages_latest.pyright
             ruff-lsp
+            ruff
             nodePackages_latest.bash-language-server
             shfmt
             isort
