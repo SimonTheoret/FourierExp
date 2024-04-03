@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Callable, Optional, Tuple, Iterable
+from typing import Callable, Optional, Tuple
 from collections.abc import Sequence
 
 import matplotlib.pyplot as plt
@@ -10,9 +10,11 @@ import torch
 
 @dataclass(init = False)
 class Image():
-    """Class for a single image. Contains the dimension of the image,
+    """
+    Class for a single image. Contains the dimension of the image,
     the original image and optionaly the fourier transform of the
-    original image."""
+    original image.
+    """
     dim: Tuple[int, int, int]
     original_image: torch.Tensor
     fourier_transform: Optional[torch.Tensor]
@@ -23,30 +25,31 @@ class Image():
         self.dim = dim
         assert self.original_image.shape == self.dim
 
-    def fourier_transform_single_image(self, img: torch.Tensor) -> torch.Tensor:
-        """Utility function for applying the fourier transform on a
+    def fourier_transform_single_image(self) -> None:
+        """
+        Utility function for updating the fourier transform on a
         single image with C channels. It applies the 2D FFT algorithm
         and then shifts the (recenter) the transform.
 
         Parameters
         ----------
         img: torch.Tensor
-            Tensor of dimension (CxHxW). This must be a single image, not a batched image
-        Returns
-        -------
-        Returns a torch.Tensor containing the fourier transform.
+            Tensor of dimension (CxHxW). This must be a single image,
+            not a batched image.
         """
-        assert len(img.shape) == 3 # Asserts it contains a channel
-        return torch.tensor([torch.fft.fftshift(torch.fft.fft2(img[i])) for i in range(img.shape[0])])
+        assert len(self.original_image) == 3 # Asserts it contains a channel
+        self.fourier_transform = torch.tensor([torch.fft.fftshift(torch.fft.fft2(self.original_image[i])) for i in range(self.original_image.shape[0])])
 
 
     def show_original_image(self, unnormalize: Optional[Callable[[np.ndarray], np.ndarray]] = None) -> None:
-        """Show the original image with the help of matplotlib. Images
+        """
+        Show the original image with the help of matplotlib. Images
         can be unnormalized by providing a callable function.
 
         Parameters
         ----------
-        Unnormalize: Optional[Callalbe[[np.ndarray], np.ndarray]] = None
+        Unnormalize: Optional[Callalbe[[np.ndarray], np.ndarray]] =
+        None
             Function to unnormalize the image before showing
             it. Defaults to None. If no callable is provided, this
             argument is not used.
@@ -87,8 +90,10 @@ class Image():
 
 @dataclass(init = False)
 class BatchedImages(Image):
-    """Class for the batched images. It contains a dictionary mapping
-    the original images to their fourier transformations."""
+    """
+    Class for the batched images. It contains a dictionary mapping the
+    original images to their fourier transformations.
+    """
     dim: Tuple[int, int, int, int]
     images: list[Image]
 
@@ -101,10 +106,9 @@ class BatchedImages(Image):
             counter +=1
         self.dim = (counter, *dimension)
         assert isinstance(self.dim, tuple)
+        assert self.original_images.shape == self.dim
 
-        assert self.original_image.shape == self.dim
-
-    def fourier_transform(self, images: Sequence[Image]) -> None:
+    def fourier_transform_all(self) -> None:
         """
         Update the content of the BatchedImages object with a tensor
         containing the results of the fourier transform on each of the
@@ -116,6 +120,6 @@ class BatchedImages(Image):
         img_batch: torch.Tensor
             Tensor of dimensions (NxCxHxW)
         """
-        assert len(images) >= 1 # Asserts the images are batched
-        [img[i].fourier_transform_single_image(img[i]) for img in images]
+        assert len(self.images) >= 1 # Asserts the images are batched
+        [ img.fourier_transform_single_image() for img in self.images ]
 
