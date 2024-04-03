@@ -14,4 +14,8 @@
 - [ ] ADV training 
 - [ ] Gaussian Augmentation
 - [ ] Regular training
-* 
+* TODO 
+** TODO Interfaces
+- [ ] Create interfaces for moving parts
+- 
+** TODO 
