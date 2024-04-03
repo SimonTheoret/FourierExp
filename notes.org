@@ -1,0 +1,15 @@
+* Notes
+** Architecture
+1. Take in Cifar-10 Dataset
+2. Apply transformations images to batch 
+3. Optionally apply Adversarial/gaussian preprocessing to batch
+4. Select the optimizer
+5. Do k times:
+   1. Train for n epoch with the optimizer
+   2. Compute the accuracy on Fourier-filtered images
+   3. Compute the accuracy on the same image (without fourier filter)
+* Features
+- [ ] ADV training 
+- [ ] Gaussian Augmentation
+- [ ] Regular training
+* 
