@@ -1,14 +1,13 @@
-from abc import abstractmethod
 from dataclasses import dataclass
 from functools import partial
-from typing import Callable, Optional
+from typing import Callable, Optional, Tuple
+from copy import copy
 
 import numpy as np
 import numpy.typing as npt
 import torch
 from torch import clip
-from torch.utils.data import Dataset as TorchDataset
-from torch.utils.data import random_split, DataLoader
+from torch.utils.data import DataLoader
 from torchvision.datasets import CIFAR10
 from torchvision.transforms import (
     Compose,
@@ -19,7 +18,6 @@ from torchvision.transforms import (
 )
 
 from architecture import Dataset
-from utils.images import BatchedImages
 
 clipT = partial(clip, min=0.0, max=1.0)
 
@@ -32,9 +30,10 @@ class Cifar10(Dataset):
     batch_size: int
     dataset_name: str
     transformations: Optional[list[Callable[[torch.Tensor], torch.Tensor]]]
-    raw_dataset: Optional[CIFAR10 | TorchDataset] = None
-    train_dataset: Optional[CIFAR10 | TorchDataset] = None
-    test_dataset: Optional[CIFAR10 | TorchDataset] = None
+    # train_dataset: Optional[CIFAR10 | TorchDataset] = None
+    # test_dataset: Optional[CIFAR10 | TorchDataset] = None
+    train_dataset: Optional[CIFAR10] = None
+    test_dataset: Optional[CIFAR10] = None
     data_root: str = "data/"
     train_dataloader: Optional[DataLoader] = None
     test_dataloader: Optional[DataLoader] = None
@@ -73,34 +72,46 @@ class Cifar10(Dataset):
             raise AttributeError("test_dataset is None")
 
     def download_raw_dataset(self):
-
         if self.transformations is not None:
-            transform  = self.default_transformations + self.transformations
+            transform = self.default_transformations + self.transformations
         else:
             transform = self.default_transformations
 
-        self.raw_dataset = CIFAR10(
+        self.train_dataset = CIFAR10(
             root=self.data_root,
+            train=True,
+            transform=Compose(transform),
+            download=True,
+        )
+
+        self.test_dataset = CIFAR10(
+            root=self.data_root,
+            train=False,
             transform=Compose(transform),
             download=True,
         )
 
     def save_dataset(self):
-        if self.raw_dataset is not None:
-            torch.save(self.raw_dataset, self.data_root + self.dataset_name)
-        else:
-            raise AttributeError("No torch_dataset attribute")
+        # if self.raw_train_dataset is not None:
+        #     torch.save(self.raw_train_dataset, self.data_root + self.dataset_name)
+        # else:
+        raise NotImplementedError(
+            "saving the dataset is automatic with download_dataset"
+        )
 
     def split_train_test(self) -> None:
-        generator = self.generator(self.seed)
-        if self.raw_dataset is not None:
-            split = random_split(
-                self.raw_dataset, lengths=[0.8, 0.2], generator=generator
-            )
-        else:
-            raise AttributeError("No torch_dataset attribute")
-        self.train_dataset = split[0]
-        self.test_dataset = split[1]
+        raise NotImplementedError(
+            "splitting the dataset is automatic with download_dataset"
+        )
+        # generator = self.generator(self.seed)
+        # if self.raw_train_dataset is not None:
+        #     split = random_split(
+        #         self.raw_train_dataset, lengths=[0.8, 0.2], generator=generator
+        #     )
+        # else:
+        #     raise AttributeError("No torch_dataset attribute")
+        # self.train_dataset = split[0]
+        # self.test_dataset = split[1]
 
     def apply_gaussian(
         self, images: npt.ArrayLike | torch.Tensor, to_tensor: bool = True
@@ -117,15 +128,13 @@ class Cifar10(Dataset):
         augmented_images = (
             torch.normal(mean=0.0, std=std, generator=generator) + imgs
         )  # add noise to images copy.
-        augmented_images = torch.clip(augmented_images, max = 1., min = 0.)
+        augmented_images = torch.clip(augmented_images, max=1.0, min=0.0)
         if to_tensor:
             return augmented_images  # return image tensor
         else:
             return augmented_images.numpy()  # return numpy array
 
-    def apply_gaussian_tensor(
-        self, images: torch.Tensor
-    ) -> torch.Tensor:
+    def apply_gaussian_tensor(self, images: torch.Tensor) -> torch.Tensor:
         """
         Applies the gaussian transformation on a tensor image. It
         returns a gaussian augmented image in the form of a tensor.
@@ -143,3 +152,31 @@ class Cifar10(Dataset):
             raise ValueError(
                 "apply_gaussian returned a npt.arraylike altough to_tensor = true"
             )
+
+    def test_numpy(self) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Returns the test data as a numpy array. It returns the data and the
+        targets in a tuple.
+        """
+        assert self.test_dataloader is not None
+        test_dl = copy(self.test_dataloader)
+        data = []
+        targets = []
+        for i, (data_point, target) in enumerate(test_dl):
+            data.append(data_point)
+            targets.append(target)
+        return np.array(data), np.array(targets)
+
+    def train_numpy(self) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Returns the train data as a numpy array. It returns the data and the
+        targets in a tuple.
+        """
+        assert self.train_dataloader is not None
+        train_dl = copy(self.train_dataloader)
+        data = []
+        targets = []
+        for i, (data_point, target) in enumerate(train_dl):
+            data.append(data_point)
+            targets.append(target)
+        return np.array(data), np.array(targets)

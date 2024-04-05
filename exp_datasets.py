@@ -10,4 +10,5 @@ class GaussianCifar10(Cifar10):
         super().__init__(batch_size=batch_size, dataset_name=dataset_name, transformations = [self.apply_gaussian_tensor])
 
 class AdversarialCifar10(Cifar10):
-    pass
+    def __init__(self, batch_size: int, dataset_name: str = "adversarialcifar10"):
+        super().__init__(batch_size=batch_size, dataset_name=dataset_name, transformations = [self.apply_gaussian_tensor])
