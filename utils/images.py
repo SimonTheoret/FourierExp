@@ -85,6 +85,12 @@ class Image():
             plt.imshow(np.transpose(npimg, (1,2,0)))
             plt.show()
 
+    def to_np(self) -> np.ndarray:
+        """
+        Returns the original_image to a numpy array
+        """
+        return self.original_image.cpu().detach().numpy()
+
 
 
 
@@ -122,4 +128,11 @@ class BatchedImages(Image):
         """
         assert len(self.images) >= 1 # Asserts the images are batched
         [ img.fourier_transform_single_image() for img in self.images ]
+
+    def to_np(self) -> np.ndarray :
+        """
+        Returns a numpy array containing all the images.
+        """
+        return np.array([image.to_np() for image in self.images])
+        
 

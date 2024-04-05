@@ -16,6 +16,19 @@
 - [ ] Regular training
 * TODO 
 ** TODO Interfaces
-- [ ] Create interfaces for moving parts
-- 
-** TODO 
+- [X] Create interfaces for moving parts
+** TODO Building blocks
+- [-] Build Dataset (Cifar10) class
+  - [X] ~download_dataset~ method
+  - [X] ~load_dataset~ method
+  - [X] ~save_datasset~ method
+  - [X] ~split_train_test~ method
+  - [ ] +~apply_transformation~ method+
+  - [X] ~apply_gaussian~ method
+  - [ ] +~generate_adversarial~ method+
+  - [ ] +~next_batch~ *methods*+
+  - [X] Clip and flip for every images
+- [ ] Build trainer class
+  - [ ] ~train~ method
+  - [ ] ~test~ method
+  - [ ] ~compute_metrics~
