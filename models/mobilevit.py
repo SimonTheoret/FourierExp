@@ -43,3 +43,6 @@ class MobileViT(nn.Module):
         else:
             assert isinstance(loss, torch.Tensor) and isinstance(logits, torch.Tensor)
             return torch.Tensor(0.0), torch.Tensor(0.0)
+
+    def train(self) -> None:
+        self.model.train()

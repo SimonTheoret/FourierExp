@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional, Self, Tuple
+from typing import Optional, Self, Tuple, Any
 from deprecation import deprecated
+from cifar10 import Cifar10
 
 import numpy as np
 import numpy.typing as npt
@@ -24,7 +25,6 @@ class Dataset(ABC):
         attribute.
         """
         pass
-
 
     @abstractmethod
     def save_dataset(self):
@@ -124,31 +124,40 @@ Float = float | torch.Tensor | np.ndarray
 
 @dataclass
 class Trainer(ABC):
-    loss: Float
     max_epochs: int
-    train_dataset: Dataset
-    test_dataset: Dataset
-    epoch: int
-    train_accuracy: Optional[Float]
-    test_accuracy: Optional[Float]
+    train_dataset: Cifar10
+    test_dataset: Cifar10
+    current_epoch: int
+    loss_func: Any
     optimizer: torch.optim.Optimizer
     model: nn.Module
-    _batch: BatchedImages
+    _batch: Optional[BatchedImages]
     attack: Optional[EvasionAttack]
+    train_accuracy: Optional[list[Float]] = None
+    test_accuracy: Optional[list[Float]] = None
+    current_loss: Float = 0
+    save_dir: str = "models/"
+    log_interval: int = 4000
+    device: Any = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     @abstractmethod
-    def train(self, model: nn.Module):
+    def train(self) -> None:
         """
         Trains the model.
         """
         pass
 
     @abstractmethod
-    def test(self, model: nn.Module):
+    def test(self) -> None:
         """
         Tests the model on the test dataset.
         """
         pass
+
+    def save_model(self) -> None:
+        """
+        Saves the model localy.
+        """
 
     @abstractmethod
     def compute_metrics(self):
