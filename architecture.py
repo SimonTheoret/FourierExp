@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional, Self, Tuple, Any
+from typing import Optional, Any
 from deprecation import deprecated
 from cifar10 import Cifar10
 
