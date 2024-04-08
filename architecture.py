@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, Tuple
 
 from art.attacks.attack import EvasionAttack
 from deprecation import deprecated
@@ -123,7 +123,7 @@ Float = float | torch.Tensor | np.ndarray
 
 
 @dataclass
-class Trainer(ABC):
+class GenericTrainer(ABC):
     exp_name: str
     max_epochs: int
     dataset: Cifar10
@@ -140,6 +140,12 @@ class Trainer(ABC):
         "adv_train_loss": [],
         "adv_test_loss": [],
     }  # contains train loss, test loss and potentially adv train loss and adv test loss
+    collected_data: dict["str", list[Float]] = {
+        "test_accuracy": [],
+        "low_fourier_accuracy": [],
+        "high_fourier_accuracy": [],
+        "adv_test_accuracy": [],
+    }
 
     # train_loss: list[Float] = []
     # test_loss: list[Float] = []
@@ -151,6 +157,9 @@ class Trainer(ABC):
     def train(
         self,
     ) -> None:
+        """
+        Trains the model. This function must be overriden for the ADVTrainer class.
+        """
         # TODO: Compute accuracy at each epoch and add it to the train_accuracy list
         self.model.train()
         assert self.dataset.train_dataset is not None
@@ -177,7 +186,9 @@ class Trainer(ABC):
     def test(
         self,
     ) -> None:
-        # TODO: Compute accuracy at each epoch and add it to the test_accuracy list
+        """
+        Tests the model.
+        """
         self.model.eval()
         test_loss = 0
         correct = 0
@@ -222,5 +233,24 @@ class Trainer(ABC):
     @abstractmethod
     def compute_metrics(self):
         """
-        Computes the Fourier metrics.
+        Compute the metrics for the current experiment/Trainer. For
+        the Vanilla and Gaussian Trainer, these metrics are the test
+        accuracy on the High filtered-Fourier images and the test
+        accuracy on the Low filtered images. For the ADVTrainer, it is
+        all of the above and the the test accuracy on the Adversarial
+        examples.
         """
+        # NOTE: DO NOT FORGET THE with torch.no_grad(), model.eval(), 
+        pass
+
+    def batched_images(self) -> Tuple[BatchedImages, torch.Tensor]:
+        """
+        Returns the BatchedImages object from the current test set and
+        the targets in the form of a torch.tensor. The fourier
+        transform is calculated during the execution of the function.
+        """
+        batched, targets =  self.dataset.test_images()
+        batched.fourier_transform_all
+        return batched, torch.tensor(targets)
+
+

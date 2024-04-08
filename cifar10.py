@@ -16,6 +16,7 @@ from torchvision.transforms import (
     RandomVerticalFlip,
     ToTensor,
 )
+from utils.images import Image, BatchedImages
 
 from architecture import Dataset
 
@@ -167,30 +168,66 @@ class Cifar10(Dataset):
                 "apply_gaussian returned a npt.arraylike altough to_tensor = true"
             )
 
-    def test_numpy(self) -> Tuple[np.ndarray, np.ndarray]:
+    def test_numpy(self) -> tuple[np.ndarray, np.ndarray]:
         """
         Returns the test data as a numpy array. It returns the data and the
-        targets in a tuple.
+        targets in a tuple of numpy arrays.
         """
         assert self.test_dataloader is not None
         test_dl = copy(self.test_dataloader)
         data = []
         targets = []
-        for i, (data_point, target) in enumerate(test_dl):
-            data.append(data_point)
-            targets.append(target)
+        for _, (data_point, target) in enumerate(test_dl):
+            data.append(data_point.numpy())
+            targets.append(target.numpy())
         return np.array(data), np.array(targets)
 
-    def train_numpy(self) -> Tuple[np.ndarray, np.ndarray]:
+    def train_numpy(self) -> tuple[np.ndarray, np.ndarray]:
         """
         Returns the train data as a numpy array. It returns the data and the
-        targets in a tuple.
+        targets in a tuple of numpy arrays.
         """
         assert self.train_dataloader is not None
         train_dl = copy(self.train_dataloader)
         data = []
         targets = []
-        for i, (data_point, target) in enumerate(train_dl):
-            data.append(data_point)
-            targets.append(target)
+        for _, (data_point, target) in enumerate(train_dl):
+            data.append(data_point.numpy())
+            targets.append(target.numpy())
         return np.array(data), np.array(targets)
+
+    def test_images(self) -> tuple[BatchedImages, np.ndarray]:
+        """Returns the test data as a BatchedImages object. It
+        returns the data and the targets in a tuple."""
+        assert self.train_dataloader is not None
+        train_dl = copy(self.train_dataloader)
+        data = []
+        targets = []
+        for i, (data_point, target) in enumerate(train_dl):
+            if i == 0:
+                assert isinstance(data_point, torch.Tensor)
+            dim = tuple(list(data_point.size()))
+            assert len(dim) == 3 
+            image = Image(data_point, dim)
+            data.append(image)
+            targets.append(target)
+        batched = BatchedImages(data)
+        return batched, np.array(targets)
+
+    def train_images(self) -> tuple[BatchedImages, np.ndarray]:
+        """Returns the train data as a BatchedImages object. It
+        returns the data and the targets in a tuple."""
+        assert self.test_dataloader is not None
+        test_dl = copy(self.test_dataloader)
+        data = []
+        targets = []
+        for i, (data_point, target) in enumerate(test_dl):
+            if i == 0:
+                assert isinstance(data_point, torch.Tensor)
+            dim = tuple(list(data_point.size()))
+            assert len(dim) == 3 
+            image = Image(data_point, dim)
+            data.append(image)
+            targets.append(target)
+        batched = BatchedImages(data)
+        return batched, np.array(targets)

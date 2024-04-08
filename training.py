@@ -1,5 +1,5 @@
 import torch
 
-from architecture import Trainer
+from architecture import GenericTrainer
 
 
