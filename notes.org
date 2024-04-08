@@ -1,15 +1,18 @@
 * Notes
 ** Architecture
 1. Take in Cifar-10 Dataset
-2. Apply transformations images to batch 
-3. Optionally apply Adversarial/gaussian preprocessing to batch
+2. Apply transformations to batch 
+3. Optionally apply gaussian preprocessing to batch
 4. Select the optimizer
 5. Do k times:
-   1. Train for n epoch with the optimizer
-   2. Compute the accuracy on Low Fourier-filtered images
-   3. Compute the accuracy on High Fourier-filtered images
-   4. Compute the accuracy on the same image (*without* fourier filter)
-   5. Save the results (Json file?)
+   1. Train for 1 epoch with the optimizer
+   2. Test the model:
+      - If ADV training, compute the adv examples and train on it
+      - Compute the accuracy on Low Fourier-filtered images on the test dataset
+      - Compute the accuracy on High Fourier-filtered images on the test dataset
+      - Compute the accuracy on the original images from the test dataset
+   3. Save the results into a dict
+6. Save the experiment results
 * Features
 - [ ] ADV training 
 - [ ] Gaussian Augmentation

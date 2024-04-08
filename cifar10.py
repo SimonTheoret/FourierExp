@@ -116,10 +116,24 @@ class Cifar10(Dataset):
     def apply_gaussian(
         self, images: npt.ArrayLike | torch.Tensor, to_tensor: bool = True
     ) -> npt.ArrayLike | torch.Tensor:
+        """
+        Applies the gaussian transformation on a tensor or a arraylike
+        object. It returns a gaussian augmented image in the form of a
+        tensor or the original object. It always clones the original
+        images.
+
+        Parameters
+        ----------
+        images: torch.Tensor | npt.ArrayLike
+            The image to augment.
+        to_tensor: bool
+            If `True`, this function returns a tensor. Else, it
+            returns an image of the same type as the `images`.
+        """
         if not isinstance(images, torch.Tensor):
-            imgs = torch.tensor(images)
+            imgs = torch.tensor(images) # Create a tensor
         else:
-            imgs = torch.clone(images)
+            imgs = torch.clone(images) # Copy the tensor
         generator = self.generator(self.seed)  # select generator with seed
         std_val = np.random.uniform(
             low=0, high=self.gaussian_sigma

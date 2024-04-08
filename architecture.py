@@ -1,15 +1,15 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional, Any
-from deprecation import deprecated
-from cifar10 import Cifar10
+from typing import Any, Callable, Optional
 
+from art.attacks.attack import EvasionAttack
+from deprecation import deprecated
 import numpy as np
 import numpy.typing as npt
 import torch
 import torch.nn as nn
-from art.attacks.attack import EvasionAttack
 
+from cifar10 import Cifar10
 from utils.images import BatchedImages
 
 
@@ -124,69 +124,103 @@ Float = float | torch.Tensor | np.ndarray
 
 @dataclass
 class Trainer(ABC):
+    exp_name: str
     max_epochs: int
-    train_dataset: Cifar10
-    test_dataset: Cifar10
-    current_epoch: int
-    loss_func: Any
+    dataset: Cifar10
+    loss_func: Callable[[torch.Tensor, torch.Tensor], torch.Tensor]
     optimizer: torch.optim.Optimizer
     model: nn.Module
     _batch: Optional[BatchedImages]
     attack: Optional[EvasionAttack]
-    train_accuracy: Optional[list[Float]] = None
+    current_epoch: int = 0
     test_accuracy: Optional[list[Float]] = None
-    current_loss: Float = 0
+    all_losses: dict["str", list[Float]] = {
+        "train_loss": [],
+        "test_loss": [],
+        "adv_train_loss": [],
+        "adv_test_loss": [],
+    }  # contains train loss, test loss and potentially adv train loss and adv test loss
+
+    # train_loss: list[Float] = []
+    # test_loss: list[Float] = []
+    # train_accuracy: Optional[list[Float]] = None
     save_dir: str = "models/"
-    log_interval: int = 4000
+    log_interval: int = 5000
     device: Any = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    @abstractmethod
-    def train(self) -> None:
-        """
-        Trains the model.
-        """
-        pass
+    def train(
+        self,
+    ) -> None:
+        # TODO: Compute accuracy at each epoch and add it to the train_accuracy list
+        self.model.train()
+        assert self.dataset.train_dataset is not None
+        assert self.dataset.train_dataloader is not None
+        for batch_idx, (data, target) in enumerate(self.dataset.train_dataloader):
+            data, target = data.to(self.device), target.to(self.device)
+            self.optimizer.zero_grad()
+            output = self.model(data)
+            loss = self.loss_func(output, target)
+            loss.backward()
+            self.all_losses["train_loss"].append(loss.item())
+            self.optimizer.step()
+            if batch_idx % self.log_interval == 0:
+                print(
+                    "Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
+                        self.current_epoch,
+                        batch_idx * len(data),
+                        len(self.dataset.train_dataset),
+                        100.0 * batch_idx / len(self.dataset.train_dataset),
+                        loss.item(),
+                    )
+                )
 
-    @abstractmethod
-    def test(self) -> None:
-        """
-        Tests the model on the test dataset.
-        """
-        pass
+    def test(
+        self,
+    ) -> None:
+        # TODO: Compute accuracy at each epoch and add it to the test_accuracy list
+        self.model.eval()
+        test_loss = 0
+        correct = 0
+        assert self.dataset.test_dataset is not None
+        assert self.dataset.test_dataloader is not None
+        with torch.no_grad():
+            for _, (data, target) in enumerate(self.dataset.test_dataloader):
+                data, target = data.to(self.device), target.to(self.device)
+                output: torch.Tensor = self.model(data)
+                test_loss += self.loss_func(output, target).sum()
+                pred = output.argmax(
+                    dim=1, keepdim=True
+                )  # get the index of the max log-probability
+                correct += pred.eq(target.view_as(pred)).sum().item()
+
+        test_loss /= len(self.dataset.test_dataset)  # average test loss
+
+        print(
+            "\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n".format(
+                test_loss,
+                correct,
+                len(self.dataset.test_dataset),
+                100.0 * correct / len(self.dataset.test_dataset),
+            )
+        )
+        self.current_epoch += 1
 
     def save_model(self) -> None:
         """
-        Saves the model localy.
+        Saves the model locally.
         """
+        torch.save(
+            {
+                "current_epoch": self.current_epoch,
+                "model_state_dict": self.model.state_dict(),
+                "optimizer_state_dict": self.optimizer.state_dict(),
+                "losses": self.all_losses,
+            },
+            self.save_dir + self.exp_name + f"_epoch{self.current_epoch}",
+        )
 
     @abstractmethod
     def compute_metrics(self):
         """
-        Computes the metrics.
+        Computes the Fourier metrics.
         """
-
-    def set_batch(self, new_batch: BatchedImages):
-        """
-        Sets the current batch _batch.
-        """
-        del self._batch
-        self._batch = new_batch
-
-    def get_batch(self):
-        """
-        Gets the current batch.
-        """
-        return self._batch
-
-    def next_batch(self, from_train: bool, from_test: bool):
-        """
-        Updates the _batch attribute to the next batch. It can either
-        be from the train dataset (self.train_dataset) or the test
-        dataset (self.test_dataset). from_train and from_test cannot
-        be equal.
-        """
-        assert from_train != from_test
-        if from_train:
-            self._batch = self.train_dataset.next_train_batch()
-        if from_test:
-            self._batch = self.test_dataset.next_test_batch()
