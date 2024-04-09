@@ -126,6 +126,7 @@ Float = float | torch.Tensor | np.ndarray
 class GenericTrainer(ABC):
     exp_name: str
     max_epochs: int
+    square_side_length: int
     dataset: Cifar10
     loss_func: Callable[[torch.Tensor, torch.Tensor], torch.Tensor]
     optimizer: torch.optim.Optimizer
@@ -139,12 +140,14 @@ class GenericTrainer(ABC):
         "test_loss": [],
         "adv_train_loss": [],
         "adv_test_loss": [],
+        "fourier_high_pass_loss": [],
+        "fourier_low_pass_loss": [],
     }  # contains train loss, test loss and potentially adv train loss and adv test loss
-    collected_data: dict["str", list[Float]] = {
+    all_accuracies: dict["str", list[Float]] = {
         "test_accuracy": [],
-        "low_fourier_accuracy": [],
-        "high_fourier_accuracy": [],
         "adv_test_accuracy": [],
+        "fourier_high_pass_accuracy": [],
+        "fourier_low_pass_accuracy": [],
     }
 
     # train_loss: list[Float] = []
@@ -198,14 +201,14 @@ class GenericTrainer(ABC):
             for _, (data, target) in enumerate(self.dataset.test_dataloader):
                 data, target = data.to(self.device), target.to(self.device)
                 output: torch.Tensor = self.model(data)
-                test_loss += self.loss_func(output, target).sum()
+                test_loss += self.loss_func(output, target)
                 pred = output.argmax(
                     dim=1, keepdim=True
                 )  # get the index of the max log-probability
-                correct += pred.eq(target.view_as(pred)).sum().item()
+                correct += pred.eq(target.view_as(pred)).item()
 
         test_loss /= len(self.dataset.test_dataset)  # average test loss
-
+        self.all_losses["test_loss"].append(test_loss)
         print(
             "\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n".format(
                 test_loss,
@@ -215,6 +218,9 @@ class GenericTrainer(ABC):
             )
         )
         self.current_epoch += 1
+        self.all_accuracies["test_accuracy"].append(
+            100.0 * correct / len(self.dataset.test_dataset)
+        )
 
     def save_model(self) -> None:
         """
@@ -226,6 +232,7 @@ class GenericTrainer(ABC):
                 "model_state_dict": self.model.state_dict(),
                 "optimizer_state_dict": self.optimizer.state_dict(),
                 "losses": self.all_losses,
+                "accuracies": self.all_accuracies,
             },
             self.save_dir + self.exp_name + f"_epoch{self.current_epoch}",
         )
@@ -240,17 +247,77 @@ class GenericTrainer(ABC):
         all of the above and the the test accuracy on the Adversarial
         examples.
         """
-        # NOTE: DO NOT FORGET THE with torch.no_grad(), model.eval(), 
+        # NOTE: DO NOT FORGET THE with torch.no_grad(), model.eval(),
         pass
 
     def batched_images(self) -> Tuple[BatchedImages, torch.Tensor]:
         """
         Returns the BatchedImages object from the current test set and
         the targets in the form of a torch.tensor. The fourier
-        transform is calculated during the execution of the function.
+        transform is calculated during the execution of this function.
         """
-        batched, targets =  self.dataset.test_images()
+        batched, targets = self.dataset.test_images()
         batched.fourier_transform_all
         return batched, torch.tensor(targets)
 
+    def compute_fourier_low_pass_accuracy(self):
+        batched, target = self.batched_images()
+        batched.filter_low_pass(self.square_side_length)
+        batched = batched.images_tensor
+        assert batched is not None
+        fourier_test_loss = 0
+        correct = 0
+        with torch.no_grad():
+            data, target = batched.to(self.device), target.to(self.device)
+            output: torch.Tensor = self.model(data)
+            fourier_test_loss += self.loss_func(output, target)
+            pred = output.argmax(
+                dim=1, keepdim=True
+            )  # get the index of the max log-probability
+            correct += pred.eq(target.view_as(pred)).item()
 
+        fourier_test_loss /= int(data.shape[0])  # average test loss
+
+        print(
+            "\nFourier low pass test set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n".format(
+                fourier_test_loss,
+                correct,
+                int(data.shape[0]),
+                100.0 * correct / int(data.shape[0]),
+            )
+        )
+        self.all_accuracies["fourier_low_pass_accuracy"].append(
+            100.0 * correct / int(data.shape[0])
+        )
+        self.all_accuracies["fourier_low_pass_loss"].append(fourier_test_loss)
+
+    def compute_fourier_high_pass_accuracy(self):
+        batched, target = self.batched_images()
+        batched.filter_high_pass(self.square_side_length)
+        batched = batched.images_tensor
+        assert batched is not None
+        fourier_test_loss = 0
+        correct = 0
+        with torch.no_grad():
+            data, target = batched.to(self.device), target.to(self.device)
+            output: torch.Tensor = self.model(data)
+            fourier_test_loss += self.loss_func(output, target)
+            pred = output.argmax(
+                dim=1, keepdim=True
+            )  # get the index of the max log-probability
+            correct += pred.eq(target.view_as(pred)).item()
+
+        fourier_test_loss /= int(data.shape[0])  # average test loss
+
+        print(
+            "\nFourier high pass test set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n".format(
+                fourier_test_loss,
+                correct,
+                int(data.shape[0]),
+                100.0 * correct / int(data.shape[0]),
+            )
+        )
+        self.all_accuracies["fourier_high_pass_accuracy"].append(
+            100.0 * correct / int(data.shape[0])
+        )
+        self.all_accuracies["fourier_high_pass_loss"].append(fourier_test_loss)

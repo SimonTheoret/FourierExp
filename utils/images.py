@@ -126,15 +126,15 @@ class Image:
             Length of a side in the square located in the center of the image.
 
         """
-        assert self.fourier_transform is not None
-        b, h, w = self.dim  # height and width
-        high_freq_centered = torch.zeros_like(self.fourier_transform)
-        for i in range(b):  # shift the frequencies to the center of the image
-            high_freq_centered[i, :, :] = torch.fft.ifftshift(
-                self.fourier_transform.clone()
-            )
-        for i in range(b):
-            cy, cx = int(h // 2 + 1), int(w // 2 + 1)  # centerness, should be (17, 17)
+        # assert self.fourier_transform is not None
+        # b, h, w = self.dim  # height and width
+        # high_freq_centered = torch.zeros_like(self.fourier_transform)
+        # for i in range(b):  # shift the frequencies to the center of the image
+        #     high_freq_centered[i, :, :] = torch.fft.ifftshift(
+        #         self.fourier_transform.clone()
+        #     )
+        # for i in range(b):
+        #     cy, cx = int(h // 2 + 1), int(w // 2 + 1)  # centerness, should be (17, 17)
         pass
 
 
