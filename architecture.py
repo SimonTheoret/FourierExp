@@ -268,6 +268,7 @@ class GenericTrainer(ABC):
         fourier_test_loss = 0
         correct = 0
         with torch.no_grad():
+            self.model.eval()
             data, target = batched.to(self.device), target.to(self.device)
             output: torch.Tensor = self.model(data)
             fourier_test_loss += self.loss_func(output, target)
@@ -299,6 +300,7 @@ class GenericTrainer(ABC):
         fourier_test_loss = 0
         correct = 0
         with torch.no_grad():
+            self.model.eval()
             data, target = batched.to(self.device), target.to(self.device)
             output: torch.Tensor = self.model(data)
             fourier_test_loss += self.loss_func(output, target)
