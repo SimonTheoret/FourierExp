@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 from functools import partial
-from typing import Callable, Optional, Tuple
+from typing import Callable, Optional
 from copy import copy
 
+from deprecation import deprecated
 import numpy as np
 import numpy.typing as npt
 import torch
@@ -132,9 +133,9 @@ class Cifar10(Dataset):
             returns an image of the same type as the `images`.
         """
         if not isinstance(images, torch.Tensor):
-            imgs = torch.tensor(images) # Create a tensor
+            imgs = torch.tensor(images)  # Create a tensor
         else:
-            imgs = torch.clone(images) # Copy the tensor
+            imgs = torch.clone(images)  # Copy the tensor
         generator = self.generator(self.seed)  # select generator with seed
         std_val = np.random.uniform(
             low=0, high=self.gaussian_sigma
@@ -207,7 +208,7 @@ class Cifar10(Dataset):
             if i == 0:
                 assert isinstance(data_point, torch.Tensor)
             dim = tuple(list(data_point.size()))
-            assert len(dim) == 3 
+            assert len(dim) == 3
             image = Image(data_point, dim)
             data.append(image)
             targets.append(target)
@@ -225,7 +226,7 @@ class Cifar10(Dataset):
             if i == 0:
                 assert isinstance(data_point, torch.Tensor)
             dim = tuple(list(data_point.size()))
-            assert len(dim) == 3 
+            assert len(dim) == 3
             image = Image(data_point, dim)
             data.append(image)
             targets.append(target)

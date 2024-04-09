@@ -83,40 +83,6 @@ class Dataset(ABC):
         """
         pass
 
-    @deprecated
-    @abstractmethod
-    def generate_adversarial(
-        self, images: npt.ArrayLike | torch.Tensor, to_tensor: bool = True
-    ) -> npt.ArrayLike | torch.Tensor:
-        """
-        Generates the adversarial examples.
-
-        Parameters
-        ----------
-        images: npt.ArrayLike | torch.Tensor.
-            Images for which the adversarial examples will be computed.
-        to_tensor: bool, defaults to True.
-            Determines if the return value should be a torch.Tensor.
-        """
-        pass
-
-    @abstractmethod
-    def next_train_batch(self) -> BatchedImages:
-        """
-        Returns a batch of images from the training set, i.e. a
-        BatchedImages object. These images are capable of computing
-        their own Fourier transformation.
-        """
-        pass
-
-    @abstractmethod
-    def next_test_batch(self) -> BatchedImages:
-        """
-        Returns a batch of images from the test set, i.e. a
-        BatchedImages object. These images are capable of computing
-        their own Fourier transformation.
-        """
-
 
 # Type aliases
 Float = float | torch.Tensor | np.ndarray

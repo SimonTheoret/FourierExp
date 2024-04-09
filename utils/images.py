@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import Callable, Optional
 from collections.abc import Sequence
-from deprecation import deprecated
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -112,20 +111,20 @@ class Image:
         """
         return self.original_image.cpu().detach().numpy()
 
-    @deprecated  # Use BatchedImages instead
-    def filter_high_pass(self, square_side_length: int) -> None:
-        """
-        Filters high frequency content and updates the
-        fourier_high_pass attributes. It uses a square with sides of
-        length `square_side_lenghts` to mask the high frequency
-        content.
+    # @deprecated  # Use BatchedImages instead
+    # def filter_high_pass(self, square_side_length: int) -> None:
+        # """
+        # Filters high frequency content and updates the
+        # fourier_high_pass attributes. It uses a square with sides of
+        # length `square_side_lenghts` to mask the high frequency
+        # content.
 
-        Parameters
-        ----------
-        square_side_length: int
-            Length of a side in the square located in the center of the image.
+        # Parameters
+        # ----------
+        # square_side_length: int
+        #     Length of a side in the square located in the center of the image.
 
-        """
+        # """
         # assert self.fourier_transform is not None
         # b, h, w = self.dim  # height and width
         # high_freq_centered = torch.zeros_like(self.fourier_transform)
@@ -135,7 +134,7 @@ class Image:
         #     )
         # for i in range(b):
         #     cy, cx = int(h // 2 + 1), int(w // 2 + 1)  # centerness, should be (17, 17)
-        pass
+        # pass
 
 
 @dataclass(init=False)
