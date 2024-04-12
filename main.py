@@ -10,12 +10,12 @@ from torchinfo import summary
 torch.manual_seed(42)
 
 
-def main_generic() -> GenericTrainer:
-    batch_size = 512
+def main_generic() -> None:
+    batch_size = 1024
     dataset = VanillaCifar10(batch_size=batch_size)
     dataset.build_dataset()  # download and setups the VanillaCifar10 object
-    # model = AllConvNet()
-    model = MobileViT()
+    model = AllConvNet()
+    # model = MobileViT()
     if isinstance(model, MobileViT):
         print(
             f"Number of trainable parameters {model.model.num_parameters(only_trainable = True)}"
@@ -27,7 +27,7 @@ def main_generic() -> GenericTrainer:
         summary(model, input_size=(batch_size, 3, 32, 32))
 
     optimizer = torch.optim.SGD(
-        model.parameters(), lr=1, momentum=0.9, weight_decay=0.001
+        model.parameters(), lr=0.15, momentum=0.9, weight_decay=0.001, 
     )
     loss_func = torch.nn.CrossEntropyLoss()
     trainer = GenericTrainer(
@@ -41,16 +41,16 @@ def main_generic() -> GenericTrainer:
         attack=None,
     )
     print(f"device is: {trainer.device}")
-    for i in range(20):
+    for i in range(100):
         trainer.train()
         trainer.test()
-        if i % 10 == 0:
-            with torch.no_grad():
-                trainer.device = torch.device("cpu")
-                trainer.compute_fourier_low_pass_accuracy()
-                trainer.compute_fourier_high_pass_accuracy()
-                trainer.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    trainer.save_data()
+        # if i % 1000 == 0:
+        #     with torch.no_grad():
+        #         trainer.device = torch.device("cpu")
+        #         trainer.compute_fourier_low_pass_accuracy()
+        #         trainer.compute_fourier_high_pass_accuracy()
+        #         trainer.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # trainer.save_data()
     
 
 if __name__ == "__main__":

@@ -69,13 +69,11 @@ class GenericTrainer(ABC):
         for batch_idx, (data, target) in enumerate(self.dataset.train_dataloader):
             data, target = data.to(self.device), target.to(self.device)
 
+            self.optimizer.zero_grad()
             output = self.model(data)
             loss = self.loss_func(output, target)
-            # print(target)
-            # print(target.shape)
             loss.backward()
             self.optimizer.step()
-            self.optimizer.zero_grad()
             self.all_losses["train_loss"].append(loss.item())
 
         print(

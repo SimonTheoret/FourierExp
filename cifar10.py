@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from functools import partial
 from typing import Callable, Optional
 
+import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
 import torch
@@ -111,7 +112,7 @@ class Cifar10(Dataset):
     test_dataloader: Optional[DataLoader] = None
     default_transformations: list[Callable[[torch.Tensor], torch.Tensor]] = field(
         default_factory=lambda: [
-            RandomCrop(size=32),  # size of the image (3x32x32)
+            # RandomCrop(size=32),  # size of the image (3x32x32)
             RandomHorizontalFlip(),
             RandomVerticalFlip(),
             ToTensor(),
@@ -147,9 +148,12 @@ class Cifar10(Dataset):
         else:
             raise AttributeError("test_dataset is None")
 
-    def show_image(self)-> None:
+    def show_image(self, img) -> None:
         """Shows an image from the dataset."""
-        #TODO: do it
+        img = img / 2 + 0.5  # unnormalize
+        npimg = img.numpy()
+        plt.imshow(np.transpose(npimg, (1, 2, 0)))
+        plt.show()
 
     def download_raw_dataset(self):
         if self.transformations is not None:

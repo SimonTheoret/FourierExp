@@ -42,9 +42,8 @@ class MobileViT(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         logits = self.model(x, return_dict=False)[0]
-        proba = self.softmax(logits)
-        assert isinstance(proba, torch.Tensor)
-        return proba
+        assert isinstance(logits, torch.Tensor)
+        return logits
 
     def train(self) -> None:
         self.model.train()
