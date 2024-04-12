@@ -33,7 +33,7 @@ class Image:
         self.dim = dim
         assert tuple(self.original_image.shape) == self.dim
         assert (
-            self.original_image[0] == 3
+            self.original_image.shape[0] == 3
         )  # Make sure the channels are at the right position
 
     def fourier_transform_single_image(self) -> None:

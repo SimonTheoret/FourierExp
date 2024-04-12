@@ -1,9 +1,9 @@
-from dataclasses import dataclass
+from abc import ABC, abstractmethod
+from copy import copy
+from dataclasses import dataclass, field
 from functools import partial
 from typing import Callable, Optional
-from copy import copy
 
-from deprecation import deprecated
 import numpy as np
 import numpy.typing as npt
 import torch
@@ -17,11 +17,81 @@ from torchvision.transforms import (
     RandomVerticalFlip,
     ToTensor,
 )
-from utils.images import Image, BatchedImages
 
-from architecture import Dataset
+from utils.images import BatchedImages, Image
 
 clipT = partial(clip, min=0.0, max=1.0)
+
+
+class Dataset(ABC):
+    """
+    Abstract class for a dataset an its transformation.
+    """
+
+    @abstractmethod
+    def download_raw_dataset(self):
+        """
+        Downloads the dataset and sets the dataset
+        attribute.
+        """
+        pass
+
+    @abstractmethod
+    def save_dataset(self):
+        """
+        Saves the dataset into the data_root folder under the name
+        `self.dataset_name`.
+        """
+        pass
+
+    @abstractmethod
+    def build_dataset(self) -> None:
+        """
+        Build the dataset by applying the transformations and the
+        appropriate functions, if any. This function updates the
+        raw_dataset, the train_dataset, the test_dataset, the
+        train_dataloader and the test_dataloader attributes. It sets
+        the transformation in the transforms attributes of the
+        datasets.
+        """
+        pass
+
+    @abstractmethod
+    def split_train_test(self) -> None:
+        """
+        Splits its current internal dataset into two Datasets. It
+        updates the train_torch_dataset and test_torch_dataset
+        attributes.
+        """
+        pass
+
+    # @deprecated
+    # @abstractmethod
+    # def apply_transformation(
+    #     self, images: npt.ArrayLike | torch.Tensor
+    # ) -> npt.ArrayLike | torch.Tensor:
+    #     """
+    #     Apply transformation, such as flip and crop, to a batch of
+    #     images.
+    #     """
+    #     pass
+
+    @abstractmethod
+    def apply_gaussian(
+        self, images: npt.ArrayLike | torch.Tensor, to_tensor: bool = True
+    ) -> npt.ArrayLike | torch.Tensor:
+        """
+        Apply gaussian transformation and returns the new images as
+        tensors. The value is clipped to `[0,1]`.
+
+        Parameters
+        ----------
+        images: npt.ArrayLike | torch.Tensor.
+            Images on which the gaussian transformation will be applied.
+        to_tensor: bool, defaults to True.
+            Determines if the return value should be a torch.Tensor.
+        """
+        pass
 
 
 @dataclass
@@ -39,13 +109,15 @@ class Cifar10(Dataset):
     data_root: str = "data/"
     train_dataloader: Optional[DataLoader] = None
     test_dataloader: Optional[DataLoader] = None
-    default_transformations: list[Callable[[torch.Tensor], torch.Tensor]] = [
-        RandomCrop(size=32),  # size of the image (3x32x32)
-        RandomHorizontalFlip(),
-        RandomVerticalFlip(),
-        ToTensor(),
-        clipT,
-    ]
+    default_transformations: list[Callable[[torch.Tensor], torch.Tensor]] = field(
+        default_factory=lambda: [
+            RandomCrop(size=32),  # size of the image (3x32x32)
+            RandomHorizontalFlip(),
+            RandomVerticalFlip(),
+            ToTensor(),
+            clipT,
+        ]
+    )
 
     seed: int = 42
     generator: Callable = torch.Generator().manual_seed
@@ -53,7 +125,7 @@ class Cifar10(Dataset):
 
     def build_dataset(self) -> None:
         self.download_raw_dataset()  # init the raw_dataset attribute
-        self.split_train_test()  # init train_dataset and test_dataset attributes
+        # self.split_train_test()
         if self.train_dataset is not None:
             self.train_dataloader = DataLoader(
                 self.train_dataset,
@@ -74,6 +146,7 @@ class Cifar10(Dataset):
             raise AttributeError("test_dataset is None")
 
     def download_raw_dataset(self):
+        print(f"Transformations applied: { self.transformations }")
         if self.transformations is not None:
             transform = self.default_transformations + self.transformations
         else:
@@ -200,16 +273,17 @@ class Cifar10(Dataset):
     def test_images(self) -> tuple[BatchedImages, np.ndarray]:
         """Returns the test data as a BatchedImages object. It
         returns the data and the targets in a tuple."""
-        assert self.train_dataloader is not None
-        train_dl = copy(self.train_dataloader)
+        assert self.test_dataloader is not None
+        test_dl = copy(self.test_dataloader)
         data = []
         targets = []
-        for i, (data_point, target) in enumerate(train_dl):
+        assert test_dl is not None
+        for i, (data_point, target) in enumerate(test_dl): # TODO: Correct bug. This should iterate over all the values of the dataset.
             if i == 0:
                 assert isinstance(data_point, torch.Tensor)
-            dim = tuple(list(data_point.size()))
+            dim = tuple(list(data_point.size())[1:])
             assert len(dim) == 3
-            image = Image(data_point, dim)
+            image = Image(data_point[i], dim)
             data.append(image)
             targets.append(target)
         batched = BatchedImages(data)
@@ -218,16 +292,18 @@ class Cifar10(Dataset):
     def train_images(self) -> tuple[BatchedImages, np.ndarray]:
         """Returns the train data as a BatchedImages object. It
         returns the data and the targets in a tuple."""
-        assert self.test_dataloader is not None
-        test_dl = copy(self.test_dataloader)
+
+        assert self.train_dataloader is not None
+        train_dl = copy(self.test_dataloader)
         data = []
         targets = []
-        for i, (data_point, target) in enumerate(test_dl):
+        assert train_dl is not None
+        for i, (data_point, target) in enumerate(train_dl): # TODO: Correct bug. This should iterate over all the values of the dataset.
             if i == 0:
                 assert isinstance(data_point, torch.Tensor)
             dim = tuple(list(data_point.size()))
             assert len(dim) == 3
-            image = Image(data_point, dim)
+            image = Image(data_point[i], dim)
             data.append(image)
             targets.append(target)
         batched = BatchedImages(data)

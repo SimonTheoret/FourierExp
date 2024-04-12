@@ -2,3 +2,5 @@
 .envrc
 .venv
 .projectile
+__pycache__
+data
