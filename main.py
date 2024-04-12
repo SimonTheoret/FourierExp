@@ -22,10 +22,14 @@ def main_generic() -> GenericTrainer:
         loss_func=loss_func,
         attack=None,
     )
-    trainer.train()
-    trainer.test()
-    trainer.compute_fourier_low_pass_accuracy()
-    trainer.compute_fourier_high_pass_accuracy()
+    for _ in range(3):
+        trainer.train()
+        trainer.test()
+
+    # with torch.no_grad():
+    #     trainer.device = torch.device("cpu")
+    #     trainer.compute_fourier_low_pass_accuracy()
+    #     trainer.compute_fourier_high_pass_accuracy()
     return trainer
 
 

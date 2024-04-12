@@ -132,6 +132,7 @@ class Cifar10(Dataset):
                 batch_size=self.batch_size,
                 num_workers=4,
                 shuffle=False,
+                pin_memory=True,
             )
         else:
             raise AttributeError("train_dataset is None")
@@ -141,6 +142,7 @@ class Cifar10(Dataset):
                 batch_size=self.batch_size,
                 num_workers=4,
                 shuffle=False,
+                pin_memory=True,
             )
         else:
             raise AttributeError("test_dataset is None")
@@ -273,17 +275,19 @@ class Cifar10(Dataset):
     def test_images(self) -> tuple[BatchedImages, np.ndarray]:
         """Returns the test data as a BatchedImages object. It
         returns the data and the targets in a tuple."""
-        assert self.test_dataloader is not None
-        test_dl = copy(self.test_dataloader)
+        assert self.test_dataset is not None
         data = []
+        test_dl = copy(self.test_dataset)
         targets = []
         assert test_dl is not None
-        for i, (data_point, target) in enumerate(test_dl): # TODO: Correct bug. This should iterate over all the values of the dataset.
+        for i, (data_point, target) in enumerate(
+            test_dl  # type: ignore
+        ):
             if i == 0:
                 assert isinstance(data_point, torch.Tensor)
-            dim = tuple(list(data_point.size())[1:])
+            dim = tuple(list(data_point.size()))
             assert len(dim) == 3
-            image = Image(data_point[i], dim)
+            image = Image(data_point, dim)
             data.append(image)
             targets.append(target)
         batched = BatchedImages(data)
@@ -293,17 +297,25 @@ class Cifar10(Dataset):
         """Returns the train data as a BatchedImages object. It
         returns the data and the targets in a tuple."""
 
-        assert self.train_dataloader is not None
-        train_dl = copy(self.test_dataloader)
+        assert self.train_dataset is not None
+        data = []
+        train_dl = DataLoader(
+            self.train_dataset,
+            batch_size=1,
+            num_workers=4,
+            shuffle=False,
+        )
         data = []
         targets = []
         assert train_dl is not None
-        for i, (data_point, target) in enumerate(train_dl): # TODO: Correct bug. This should iterate over all the values of the dataset.
+        for i, (data_point, target) in enumerate(
+            train_dl  # TODO: change for self.train_dataset
+        ):
             if i == 0:
                 assert isinstance(data_point, torch.Tensor)
             dim = tuple(list(data_point.size()))
             assert len(dim) == 3
-            image = Image(data_point[i], dim)
+            image = Image(data_point[0], dim)
             data.append(image)
             targets.append(target)
         batched = BatchedImages(data)

@@ -51,7 +51,7 @@ class GenericTrainer(ABC):
     # test_loss: list[Float] = []
     # train_accuracy: Optional[list[Float]] = None
     save_dir: str = "models/"
-    log_interval: int = 5000
+    log_interval: int = 500
     device: Any = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     def train(
@@ -92,6 +92,7 @@ class GenericTrainer(ABC):
         """
         Tests the model.
         """
+        print("Testing started")
         self.model.eval()
         test_loss = 0
         correct = 0
@@ -149,21 +150,32 @@ class GenericTrainer(ABC):
         return batched, torch.tensor(targets)
 
     def compute_fourier_low_pass_accuracy(self):
+        print("Computing fourier low pass accuracy")
         batched, target = self.batched_images()
         batched.filter_low_pass(self.square_side_length)
-        batched = batched.images_tensor
         assert batched is not None
+        assert batched.low_pass_fourier is not None
+        assert batched.images_tensor is not None
+        print(batched.low_pass_fourier.type())
+        is_error = torch.allclose( 
+            batched.low_pass_fourier.to(self.device), batched.images_tensor.to(self.device)
+        )  # TODO: lowpass and initial fourier tensor should not be close
+        assert is_error is False
         fourier_test_loss = 0
         correct = 0
         with torch.no_grad():
             self.model.eval()
-            data, target = batched.to(self.device), target.to(self.device)
+            self.model.to(self.device)
+            data, target = (
+                batched.low_pass_fourier.to(self.device),
+                target.to(self.device),
+            )
             output: torch.Tensor = self.model(data)
             fourier_test_loss += self.loss_func(output, target)
             pred = output.argmax(
                 dim=1, keepdim=True
             )  # get the index of the max log-probability
-            correct += pred.eq(target.view_as(pred)).item()
+            correct += pred.eq(target.view_as(pred)).sum().item()
 
         fourier_test_loss /= int(data.shape[0])  # average test loss
 
@@ -178,24 +190,29 @@ class GenericTrainer(ABC):
         self.all_accuracies["fourier_low_pass_accuracy"].append(
             100.0 * correct / int(data.shape[0])
         )
-        self.all_accuracies["fourier_low_pass_loss"].append(fourier_test_loss)
+        self.all_losses["fourier_low_pass_loss"].append(fourier_test_loss)
 
     def compute_fourier_high_pass_accuracy(self):
+        print("Computing fourier high pass accuracy")
         batched, target = self.batched_images()
         batched.filter_high_pass(self.square_side_length)
-        batched = batched.images_tensor
         assert batched is not None
+        assert batched.high_pass_fourier is not None
         fourier_test_loss = 0
         correct = 0
         with torch.no_grad():
             self.model.eval()
-            data, target = batched.to(self.device), target.to(self.device)
+            self.model.to(self.device)
+            data, target = (
+                batched.high_pass_fourier.to(self.device),
+                target.to(self.device),
+            )
             output: torch.Tensor = self.model(data)
             fourier_test_loss += self.loss_func(output, target)
             pred = output.argmax(
                 dim=1, keepdim=True
             )  # get the index of the max log-probability
-            correct += pred.eq(target.view_as(pred)).item()
+            correct += pred.eq(target.view_as(pred)).sum().item()
 
         fourier_test_loss /= int(data.shape[0])  # average test loss
 
@@ -210,4 +227,4 @@ class GenericTrainer(ABC):
         self.all_accuracies["fourier_high_pass_accuracy"].append(
             100.0 * correct / int(data.shape[0])
         )
-        self.all_accuracies["fourier_high_pass_loss"].append(fourier_test_loss)
+        self.all_losses["fourier_high_pass_loss"].append(fourier_test_loss)
