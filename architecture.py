@@ -51,7 +51,7 @@ class GenericTrainer(ABC):
     # test_loss: list[Float] = []
     # train_accuracy: Optional[list[Float]] = None
     save_dir: str = "models/"
-    log_interval: int = 500
+    log_interval: int = 200
     device: Any = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     def train(
@@ -61,30 +61,29 @@ class GenericTrainer(ABC):
         Trains the model. This function must be overriden for the ADVTrainer class.
         """
         # TODO: Compute accuracy at each epoch and add it to the train_accuracy list
-        print("Training started")
+        print(f"Training epoch {self.current_epoch} started")
         self.model.to(self.device)
         self.model.train()
         assert self.dataset.train_dataset is not None
         assert self.dataset.train_dataloader is not None
-        print(f"device is: {self.device}")
         for batch_idx, (data, target) in enumerate(self.dataset.train_dataloader):
             data, target = data.to(self.device), target.to(self.device)
-            self.optimizer.zero_grad()
+
             output = self.model(data)
             loss = self.loss_func(output, target)
+            # print(target)
+            # print(target.shape)
             loss.backward()
-            self.all_losses["train_loss"].append(loss.item())
             self.optimizer.step()
-            if batch_idx % self.log_interval == 0:
-                print(
-                    "Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
-                        self.current_epoch,
-                        batch_idx * len(data),
-                        len(self.dataset.train_dataset),
-                        100.0 * batch_idx / len(self.dataset.train_dataset),
-                        loss.item(),
-                    )
-                )
+            self.optimizer.zero_grad()
+            self.all_losses["train_loss"].append(loss.item())
+
+        print(
+            "Train Epoch: {} \tLoss: {:.6f}".format(
+                self.current_epoch,
+                self.all_losses["train_loss"][-1],
+            )
+        )
 
     def test(
         self,
@@ -124,9 +123,9 @@ class GenericTrainer(ABC):
             100.0 * correct / len(self.dataset.test_dataset)
         )
 
-    def save_model(self) -> None:
+    def save_data(self) -> None:
         """
-        Saves the model locally.
+        Saves the model and the collected data locally.
         """
         torch.save(
             {
@@ -156,9 +155,9 @@ class GenericTrainer(ABC):
         assert batched is not None
         assert batched.low_pass_fourier is not None
         assert batched.images_tensor is not None
-        print(batched.low_pass_fourier.type())
-        is_error = torch.allclose( 
-            batched.low_pass_fourier.to(self.device), batched.images_tensor.to(self.device)
+        is_error = torch.allclose(
+            batched.low_pass_fourier.to(self.device),
+            batched.images_tensor.to(self.device),
         )  # TODO: lowpass and initial fourier tensor should not be close
         assert is_error is False
         fourier_test_loss = 0

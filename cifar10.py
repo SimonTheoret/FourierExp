@@ -147,13 +147,16 @@ class Cifar10(Dataset):
         else:
             raise AttributeError("test_dataset is None")
 
+    def show_image(self)-> None:
+        """Shows an image from the dataset."""
+        #TODO: do it
+
     def download_raw_dataset(self):
-        print(f"Transformations applied: { self.transformations }")
         if self.transformations is not None:
             transform = self.default_transformations + self.transformations
         else:
             transform = self.default_transformations
-
+        print(f"Transformations applied: {transform}")
         self.train_dataset = CIFAR10(
             root=self.data_root,
             train=True,

@@ -11,11 +11,20 @@ class MobileViT(nn.Module):
     def __init__(
         self,
         configuration: Optional[MobileViTConfig] = None,
-        from_pretrained: bool = True,
+        from_pretrained: bool = False,
     ):
+        super().__init__()
+        self.softmax = nn.Softmax(dim=1)
         # Configuration. Could probably add options around here.
         if configuration is None:
-            self.configuration: MobileViTConfig = MobileViTConfig()
+            self.configuration: MobileViTConfig = MobileViTConfig(
+                num_channels=3,
+                image_size=32,
+                num_labels=10,
+                hidden_size=[64, 80, 96],
+                neck_hidden_sizes=[16, 16, 24, 48, 64, 80, 320],
+                output_stride = 16,
+            )
         else:
             self.configuration: MobileViTConfig = configuration
 
@@ -31,18 +40,14 @@ class MobileViT(nn.Module):
         else:
             self.model = MobileViTForImageClassification(self.configuration)
 
-    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
-        loss, logits, _ = self.model(
-            x,
-            return_dict=False,
-        )
-        # This is the main branch.
-        if isinstance(loss, torch.Tensor) and isinstance(logits, torch.Tensor):
-            return loss, logits
-        # This branch should not happen and is only there to make sure the LSP is happy.
-        else:
-            assert isinstance(loss, torch.Tensor) and isinstance(logits, torch.Tensor)
-            return torch.Tensor(0.0), torch.Tensor(0.0)
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        logits = self.model(x, return_dict=False)[0]
+        proba = self.softmax(logits)
+        assert isinstance(proba, torch.Tensor)
+        return proba
 
     def train(self) -> None:
         self.model.train()
+
+    def eval(self) -> None:
+        self.model.eval()

@@ -3,6 +3,7 @@
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
+import ipdb
 
 
 class AllConvNet(nn.Module):
@@ -30,6 +31,7 @@ class AllConvNet(nn.Module):
         self.conv8 = nn.Conv2d(192, 192, 1)
 
         self.class_conv = nn.Conv2d(192, n_classes, 1)
+        self.softmax = nn.Softmax(dim = 1)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x_drop = F.dropout(x, 0.2)
@@ -48,4 +50,6 @@ class AllConvNet(nn.Module):
         pool_out = F.adaptive_avg_pool2d(class_out, 1)
         pool_out.squeeze_(-1)
         pool_out.squeeze_(-1)
-        return pool_out
+        out = self.softmax(pool_out)
+        return out
+
