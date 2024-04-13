@@ -1,10 +1,11 @@
+from typing import Optional
+
+import torch
+import torch.nn as nn
 from transformers import (
     MobileViTConfig,
     MobileViTForImageClassification,
 )
-import torch.nn as nn
-import torch
-from typing import Optional, Tuple
 
 
 class MobileViT(nn.Module):

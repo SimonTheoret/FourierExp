@@ -3,7 +3,6 @@
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
-import ipdb
 
 
 class AllConvNet(nn.Module):
@@ -23,7 +22,7 @@ class AllConvNet(nn.Module):
         super().__init__()
 
         self.dp0 = nn.Dropout2d(p=0.2)
-        self.conv1 = nn.Conv2d(3, 96, 3, padding=1)
+        self.conv1 = nn.Conv2d(in_channels, 96, 3, padding=1)
         self.bn1 = nn.BatchNorm2d(96)
         self.conv2 = nn.Conv2d(96, 96, 3, padding=1)
         self.bn2 = nn.BatchNorm2d(96)
@@ -41,7 +40,7 @@ class AllConvNet(nn.Module):
         self.bn7 = nn.BatchNorm2d(192)
         self.conv8 = nn.Conv2d(192, 192, 1)
         self.bn8 = nn.BatchNorm2d(192)
-        self.conv9 = nn.Conv2d(192, 10, 1)
+        self.conv9 = nn.Conv2d(192, n_classes, 1)
         self.avg = nn.AvgPool2d(6)
 
         nn.init.xavier_normal_(self.conv1.weight)

@@ -13,7 +13,6 @@ from torch.utils.data import DataLoader
 from torchvision.datasets import CIFAR10
 from torchvision.transforms import (
     Compose,
-    RandomCrop,
     RandomHorizontalFlip,
     RandomVerticalFlip,
     ToTensor,

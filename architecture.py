@@ -66,7 +66,7 @@ class GenericTrainer(ABC):
         self.model.train()
         assert self.dataset.train_dataset is not None
         assert self.dataset.train_dataloader is not None
-        for batch_idx, (data, target) in enumerate(self.dataset.train_dataloader):
+        for _, (data, target) in enumerate(self.dataset.train_dataloader):
             data, target = data.to(self.device), target.to(self.device)
 
             self.optimizer.zero_grad()
@@ -121,12 +121,24 @@ class GenericTrainer(ABC):
             100.0 * correct / len(self.dataset.test_dataset)
         )
 
-    def save_data(self) -> None:
+    def save_data(
+        self,
+        exp_name: str,
+        model_name: str,
+        optim_name: str,
+        dataset_name: str,
+        batch_size: int = 1024,
+    ) -> None:
         """
         Saves the model and the collected data locally.
         """
         torch.save(
             {
+                "exp_name": exp_name,
+                "optim_name": optim_name,
+                "model_name": model_name,
+                "dataset_name": dataset_name,
+                "batch_size": batch_size,
                 "current_epoch": self.current_epoch,
                 "model_state_dict": self.model.state_dict(),
                 "optimizer_state_dict": self.optimizer.state_dict(),
@@ -195,6 +207,7 @@ class GenericTrainer(ABC):
         batched.filter_high_pass(self.square_side_length)
         assert batched is not None
         assert batched.high_pass_fourier is not None
+        assert batched.images_tensor is not None
         fourier_test_loss = 0
         correct = 0
         with torch.no_grad():

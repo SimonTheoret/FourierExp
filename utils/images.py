@@ -235,6 +235,7 @@ class BatchedImages(Image):
         # TODO: recompose the original but filtered image with torch.fft
         # TODO: Do the same for the low pass
         self.high_pass_fourier = torch.fft.ifft2(high_freq_centered).real
+        # self.show_image(self.high_pass_fourier[0])
 
     def filter_low_pass(self, square_side_length: int) -> None:
         """
@@ -265,3 +266,12 @@ class BatchedImages(Image):
             cw - half_length : cw + half_length,
         ] = 0
         self.low_pass_fourier = torch.fft.ifft2(torch.fft.ifftshift(low_freq_centered)).real
+        # self.show_image(self.low_pass_fourier[0])
+
+
+    def show_image(self, img: torch.Tensor) -> None:
+        """Shows an image"""
+        img = img / 2 + 0.5  # unnormalize
+        npimg = img.cpu().detach().numpy()
+        plt.imshow(np.transpose(npimg, (1, 2, 0)))
+        plt.show()

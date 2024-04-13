@@ -55,6 +55,7 @@
               isort
               nixfmt
               nil
+              bash
             ] ++ (with pkgs.pythonPackages; [
               pip
               virtualenv
