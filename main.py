@@ -60,7 +60,7 @@ def main_generic(
     trainer = GenericTrainer(
         exp_name=exp_name,
         max_epochs=1,
-        square_side_length=2,
+        square_side_length=4, # TODO: to include in the report
         dataset=dataset,
         optimizer=optimizer,
         model=model,

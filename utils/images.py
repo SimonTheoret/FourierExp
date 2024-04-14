@@ -56,7 +56,7 @@ class Image:
         assert len(self.original_image) == 3  # Asserts it contains a channel
         self.fourier_transform = torch.tensor(
             [
-                torch.fft.fftshift(torch.fft.fft2(self.original_image[i]), dim=(-2, -1))
+                torch.fft.fftshift(torch.fft.fft2(self.original_image[i]), dim=(1, 2))
                 for i in range(self.original_image.shape[0])
             ]
         )
@@ -190,7 +190,7 @@ class BatchedImages(Image):
             "cuda" if torch.cuda.is_available() else "cpu"
         )  # uses the gpu if possible
         self.fourier_tensor = torch.fft.fftshift(
-            torch.fft.fft2(self.images_tensor.to(device)), dim=(-2, -1)
+            torch.fft.fft2(self.images_tensor.to(device)), dim=(2, 3)
         )
 
     def to_np(self) -> np.ndarray:
@@ -219,11 +219,11 @@ class BatchedImages(Image):
         assert self.fourier_tensor is not None
         high_freq_centered = (
             torch.fft.ifftshift(  # shifts the HF in the center of the image
-                self.fourier_tensor, dim=(-2, -1)
+                self.fourier_tensor.clone(), dim=(2, 3)
             )
         )  # Only shift the height and width dimensions
         assert isinstance(high_freq_centered, torch.Tensor)
-        h, w = high_freq_centered.size(dim=-2), high_freq_centered.size(dim=-1)
+        h, w = high_freq_centered.size(dim=2), high_freq_centered.size(dim=3)
         ch, cw = h // 2, w // 2
         half_length = square_side_length // 2
         high_freq_centered[
@@ -235,7 +235,6 @@ class BatchedImages(Image):
         # TODO: recompose the original but filtered image with torch.fft
         # TODO: Do the same for the low pass
         self.high_pass_fourier = torch.fft.ifft2(high_freq_centered).real
-        # self.show_image(self.high_pass_fourier[0])
 
     def filter_low_pass(self, square_side_length: int) -> None:
         """
@@ -253,10 +252,10 @@ class BatchedImages(Image):
         """
         assert self.fourier_tensor is not None
         low_freq_centered = (
-            self.fourier_tensor
+            self.fourier_tensor.clone()
         )  # No need to shift, LF are already centered
         assert isinstance(low_freq_centered, torch.Tensor)
-        h, w = low_freq_centered.size(dim=-2), low_freq_centered.size(dim=-1)
+        h, w = low_freq_centered.size(dim=2), low_freq_centered.size(dim=3)
         ch, cw = h // 2, w // 2
         half_length = square_side_length // 2
         low_freq_centered[
@@ -266,9 +265,8 @@ class BatchedImages(Image):
             cw - half_length : cw + half_length,
         ] = 0
         self.low_pass_fourier = torch.fft.ifft2(
-            torch.fft.ifftshift(low_freq_centered), dim=(-2, -1)
+            torch.fft.ifftshift(low_freq_centered, dim=(2, 3))
         ).real
-        # self.show_image(self.low_pass_fourier[0])
 
     def show_image(self, img: torch.Tensor) -> None:
         """Shows an image"""
