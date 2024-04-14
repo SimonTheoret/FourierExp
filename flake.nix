@@ -65,6 +65,7 @@
               matplotlib
               transformers
               pandas
+              latexify-py
             ]);
 
           # shellHook = ''

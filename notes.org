@@ -15,23 +15,23 @@
 6. Save the experiment results
 * Features
 - [ ] ADV training 
-- [ ] Gaussian Augmentation
-- [ ] Regular training
-* TODO 
-** TODO Interfaces
+- [X] Gaussian Augmentation
+- [X] Regular training
+* DONE 
+** DONE Interfaces
 - [X] Create interfaces for moving parts
-** TODO Building blocks
-- [-] Build Dataset (Cifar10) class
+** DONE Building blocks
+- [X] Build Dataset (Cifar10) class
   - [X] ~download_dataset~ method
   - [X] ~load_dataset~ method
   - [X] ~save_datasset~ method
   - [X] ~split_train_test~ method
-  - [ ] +~apply_transformation~ method+
+  - [X] +~apply_transformation~ method+
   - [X] ~apply_gaussian~ method
-  - [ ] +~generate_adversarial~ method+
-  - [ ] +~next_batch~ *methods*+
+  - [X] +~generate_adversarial~ method+
+  - [X] +~next_batch~ *methods*+
   - [X] Clip and flip for every images
-- [ ] Build trainer class
-  - [ ] ~train~ method
-  - [ ] ~test~ method
-  - [ ] ~compute_metrics~
+- [X] Build trainer class
+  - [X] ~train~ method
+  - [X] ~test~ method
+  - [X] ~compute_metrics~

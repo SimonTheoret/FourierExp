@@ -1,5 +1,4 @@
-import fire
-import matplotlib
+import matplotlib.pyplot as plt
 import torch
 import pandas as pd
 
@@ -21,9 +20,11 @@ experiments = [
     # "mobilevitsgdadv",
 ]
 print("Looking for the file")
-exp_dict = {}
+expe_dict = {}
 for exp in experiments:
-    exp_dict[exp] = torch.load("models/" + exp + "_epoch100")
+    expe_dict[exp] = torch.load("models/" + exp + "_epoch100")
+
+
 # fourier_accuracies = {
 #     key: data["accuracies"][key]
 #     for key in ["fourier_high_pass_accuracy", "fourier_low_pass_accuracy"]
