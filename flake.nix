@@ -49,7 +49,6 @@
               nodePackages_latest.pyright
               ruff
               ruff-lsp
-              nodePackages_latest.bash-language-server
               shellcheck
               shfmt
               isort
@@ -65,6 +64,7 @@
               fire
               matplotlib
               transformers
+              pandas
             ]);
 
           # shellHook = ''

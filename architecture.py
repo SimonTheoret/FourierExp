@@ -26,6 +26,7 @@ class GenericTrainer(ABC):
     model: nn.Module
     # _batch: Optional[BatchedImages]
     attack: Optional[EvasionAttack]
+    adv: bool = False
     current_epoch: int = 0
     test_accuracy: Optional[list[Float]] = None
     all_losses: dict["str", list[Float]] = field(
