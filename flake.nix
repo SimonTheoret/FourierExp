@@ -66,6 +66,7 @@
               transformers
               pandas
               latexify-py
+              seaborn
             ]);
 
           # shellHook = ''

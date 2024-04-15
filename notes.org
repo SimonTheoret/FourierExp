@@ -35,3 +35,32 @@
   - [X] ~train~ method
   - [X] ~test~ method
   - [X] ~compute_metrics~
+* Reading
+Readings from the original paper [[https://proceedings.neurips.cc/paper/2019/file/b05b57f6add810d3b7490866d74c0053-Paper.pdf][Fourier perspective]].
+1. Section 4.1
+1. Section 4.2
+2. Section 4.4
+* Other experiments
+** TODO Computing the l_1 norm distribution of the Gaussian augmentations
+The planning:
+- Sample a few thousand vectors
+- Compute the l_1 norm over these vectors
+- Do a few graph, visualization
+** TODO Computing accuracy with a few different bandwidth
+The planning:
+- For model /i/:
+  - For bandwidth /B/:
+    1. Compute the fourier transform of the dataset
+    2. Apply low frequency pass
+    3. Compute accuracy with low frequency passed images
+    4. Apply high frequency pass
+    5. Compute accuracy with high frequency passed images
+  - Save the data:
+    - Model
+    - Optimizer used
+    - High frequency accuracy
+    - Low frequency accuracy
+    - bandwidth
+
+  
+

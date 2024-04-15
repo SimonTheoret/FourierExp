@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
 import torch
 import pandas as pd
+import seaborn as sns
+
+sns.set()
 
 # TODO: Compute the average over the 49 batches
 
@@ -21,10 +24,16 @@ experiments = [
 ]
 print("Looking for the file")
 expe_dict = {}
+fourier_acc_dict = {}
 for exp in experiments:
     expe_dict[exp] = torch.load("models/" + exp + "_epoch100")
+    accs = expe_dict[exp]["accuracies"]
+    fourier_acc_dict[exp + "low"] = accs["fourier_low_pass_accuracy"]
+    fourier_acc_dict[exp + "high"] = accs["fourier_high_pass_accuracy"]
 
-
+fourier_df = pd.DataFrame.from_dict(fourier_acc_dict)
+print(fourier_df)
+fourier_df.plot()
 # fourier_accuracies = {
 #     key: data["accuracies"][key]
 #     for key in ["fourier_high_pass_accuracy", "fourier_low_pass_accuracy"]
