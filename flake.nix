@@ -67,6 +67,7 @@
               pandas
               latexify-py
               seaborn
+              pandas-stubs
             ]);
 
           # shellHook = ''

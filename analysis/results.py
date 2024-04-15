@@ -32,8 +32,19 @@ for exp in experiments:
     fourier_acc_dict[exp + "high"] = accs["fourier_high_pass_accuracy"]
 
 fourier_df = pd.DataFrame.from_dict(fourier_acc_dict)
+mapper = {
+    "allcnnvanillaadamwlow": "ALL-CNN Vanilla Adamw Low pass" , "allcnnvanillaadamwhigh":"ALL-CNN Vanilla Adam High pass",
+    "allcnngaussianadamwlow": "ALL-CNN Gaussian Adamw Low pass" , "allcnngaussianadamwhigh":"ALL-CNN Gaussian Adam High pass",
+    "allcnnvanillasgdlow": "ALL-CNN Vanilla Adamw Low pass" , "allcnnvanillaadamwhigh":"ALL-CNN Vanilla Adam High pass",
+    "allcnnvanillaadamwlow": "ALL-CNN Vanilla Adamw Low pass" , "allcnnvanillaadamwhigh":"ALL-CNN Vanilla Adam High pass",
+    "allcnnvanillaadamwlow": "ALL-CNN Vanilla Adamw Low pass" , "allcnnvanillaadamwhigh":"ALL-CNN Vanilla Adam High pass",
+    "allcnnvanillaadamwlow": "ALL-CNN Vanilla Adamw Low pass" , "allcnnvanillaadamwhigh":"ALL-CNN Vanilla Adam High pass",
+    "allcnnvanillaadamwlow": "ALL-CNN Vanilla Adamw Low pass" , "allcnnvanillaadamwhigh":"ALL-CNN Vanilla Adam High pass",
+    "allcnnvanillaadamwlow": "ALL-CNN Vanilla Adamw Low pass" , "allcnnvanillaadamwhigh":"ALL-CNN Vanilla Adam High pass",
+          }
 print(fourier_df)
 fourier_df.plot()
+plt.show()
 # fourier_accuracies = {
 #     key: data["accuracies"][key]
 #     for key in ["fourier_high_pass_accuracy", "fourier_low_pass_accuracy"]
