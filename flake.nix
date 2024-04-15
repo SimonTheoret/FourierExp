@@ -63,7 +63,7 @@
               numpy
               fire
               matplotlib
-              transformers
+              (transformers.override {torch = torch-bin; torchvision = torchvision-bin; torchaudio=torchaudio-bin;})
               pandas
               latexify-py
               seaborn
