@@ -43,9 +43,9 @@ mapper_acc = {
     "allcnnvanillasgd": "CNN Vanilla SGD",
     "allcnngaussiansgd": "CNN Gaussian SGD",
     "mobilevitadamwvanill": "ViT Vanilla Adamw",
-    "mobilevitadamwgaussian": "Vit Gaussian Adamw",
-    "mobilevitsgdvanilla": "Vit Vanilla SGD",
-    "mobilevitsgdgaussian": "Vit Gaussian SGD",
+    "mobilevitadamwgaussian": "ViT Gaussian Adamw",
+    "mobilevitsgdvanilla": "ViT Vanilla SGD",
+    "mobilevitsgdgaussian": "ViT Gaussian SGD",
 }
 mapper_fourier = {  # TODO: update for the ADV results
     "allcnnvanillaadamwlow": "CNN Vanilla Adamw Low pass",
@@ -58,12 +58,12 @@ mapper_fourier = {  # TODO: update for the ADV results
     "allcnngaussiansgdhigh": "CNN Gaussian SGD High pass",
     "mobilevitadamwvanilllow": "ViT Vanilla Adamw Low pass",
     "mobilevitadamwvanillhigh": "ViT Vanilla Adamw High pass",
-    "mobilevitadamwgaussianlow": "Vit Gaussian Adamw Low pass",
-    "mobilevitadamwgaussianhigh": "Vit Gaussian Adamw High pass",
-    "mobilevitsgdvanillalow": "Vit Vanilla SGD Low pass",
-    "mobilevitsgdvanillahigh": "Vit Vanilla SGD High pass",
-    "mobilevitsgdgaussianlow": "Vit Gaussian SGD Low pass",
-    "mobilevitsgdgaussianhigh": "Vit Gaussian SGD High pass",
+    "mobilevitadamwgaussianlow": "ViT Gaussian Adamw Low pass",
+    "mobilevitadamwgaussianhigh": "ViT Gaussian Adamw High pass",
+    "mobilevitsgdvanillalow": "ViT Vanilla SGD Low pass",
+    "mobilevitsgdvanillahigh": "ViT Vanilla SGD High pass",
+    "mobilevitsgdgaussianlow": "ViT Gaussian SGD Low pass",
+    "mobilevitsgdgaussianhigh": "ViT Gaussian SGD High pass",
 }
 
 
@@ -86,6 +86,31 @@ test_acc_df.rename(columns=mapper_acc, inplace=True)
 #     "rx-",
 #     "rP-",
 # ]  # TODO update for the ADV resutls
+high_list = fourier_high_df.iloc[-1].to_list()[:-1]
+low_list = fourier_low_df.iloc[-1].to_list()[:-1]
+test_acc_list = test_acc_df.iloc[90].to_list()
+exp_list = list(mapper_acc.values())
+
+big_dict = {
+    "High Pass acc": high_list,
+    "Low Pass Acc": low_list,
+    "Test Acc": test_acc_list,
+    "Experiments": exp_list,
+}
+df = pd.DataFrame.from_dict(big_dict)
+ax = df.plot(
+    kind="bar",
+    x="Experiments",
+    y=["High Pass acc", "Low Pass Acc", "Test Acc"],
+    stacked=True,
+    title="Accuracy with High, low, and no frequency filter",
+    rot = 30
+    # color=["red", "green", "blue"],
+)
+
+plt.savefig("assets/stacked_acc", dpi = 1000)
+plt.show()
+
 
 fourier_high_df.plot(
     x="index",
