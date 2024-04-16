@@ -26,15 +26,28 @@ print("Looking for the file")
 expe_dict = {}
 fourier_acc_low_dict = {}
 fourier_acc_high_dict = {}
+test_acc_dict = {}
 for exp in experiments:
     expe_dict[exp] = torch.load("models/" + exp + "_epoch100")
     accs = expe_dict[exp]["accuracies"]
     fourier_acc_low_dict[exp + "low"] = accs["fourier_low_pass_accuracy"]
     fourier_acc_high_dict[exp + "high"] = accs["fourier_high_pass_accuracy"]
+    test_acc_dict[exp] = accs["test_accuracy"]
 
+test_acc_df = pd.DataFrame.from_dict(test_acc_dict)
 fourier_low_df = pd.DataFrame.from_dict(fourier_acc_low_dict)
 fourier_high_df = pd.DataFrame.from_dict(fourier_acc_high_dict)
-mapper = {  # TODO: update for the ADV results
+mapper_acc = {
+    "allcnnvanillaadamw": "CNN Vanilla Adamw",
+    "allcnngaussianadamw": "CNN Gaussian Adamw",
+    "allcnnvanillasgd": "CNN Vanilla SGD",
+    "allcnngaussiansgd": "CNN Gaussian SGD",
+    "mobilevitadamwvanill": "ViT Vanilla Adamw",
+    "mobilevitadamwgaussian": "Vit Gaussian Adamw",
+    "mobilevitsgdvanilla": "Vit Vanilla SGD",
+    "mobilevitsgdgaussian": "Vit Gaussian SGD",
+}
+mapper_fourier = {  # TODO: update for the ADV results
     "allcnnvanillaadamwlow": "CNN Vanilla Adamw Low pass",
     "allcnnvanillaadamwhigh": "CNN Vanilla Adamw High pass",
     "allcnngaussianadamwlow": "CNN Gaussian Adamw Low pass",
@@ -54,24 +67,28 @@ mapper = {  # TODO: update for the ADV results
 }
 
 
-index = [0, 15, 30, 45, 60, 75, 90]
+index = list(range(0, 91, 15))
 fourier_low_df["index"] = index
+fourier_low_df.set_index("index")
 fourier_high_df["index"] = index
-fourier_high_df.rename(columns=mapper, inplace=True)
-fourier_low_df.rename(columns=mapper, inplace=True)
-styles = [
-    "bx-",
-    "b|-",
-    "bp-",
-    "bP-",
-    "rx--",
-    "r|--",
-    "rp--",
-    "rP--",
-]  # TODO update for the ADV resutls
-fig = fourier_high_df.plot(
+fourier_high_df.set_index("index")
+fourier_high_df.rename(columns=mapper_fourier, inplace=True)
+fourier_low_df.rename(columns=mapper_fourier, inplace=True)
+test_acc_df.rename(columns=mapper_acc, inplace=True)
+
+# styles = [
+#     "bx--",
+#     "bP--",
+#     "bx-",
+#     "bP-",
+#     "rx--",
+#     "rP--",
+#     "rx-",
+#     "rP-",
+# ]  # TODO update for the ADV resutls
+
+fourier_high_df.plot(
     x="index",
-    style=styles,
     title="Accuracy Without High Frequency Features",
     xlabel="Epoch",
     ylabel="Test accuracy",
@@ -80,13 +97,22 @@ plt.savefig("assets/high_pass_fourier_test_acc")
 plt.show()
 fourier_low_df.plot(
     x="index",
-    style=styles,
     title="Accuracy Without Low Frequency Features",
     xlabel="Epoch",
     ylabel="Test accuracy",
 )
 plt.savefig("assets/low_pass_fourier_test_acc")
 plt.show()
+
+test_acc_df.plot(
+    # style=styles,
+    title="Models Test Accuracy",
+    xlabel="Epoch",
+    ylabel="Test accuracy",
+)
+plt.savefig("assets/test_accuracy")
+plt.show()
+
 
 # for i, col in enumerate(fourier_df.columns):
 #     fourier_df[col].plot()
