@@ -86,6 +86,14 @@ def main_generic(
                 dataset_name,
                 batch_size,
             )
+
+    with torch.no_grad():
+        trainer.device = torch.device("cpu")
+        trainer.compute_fourier_low_pass_accuracy()
+        trainer.compute_fourier_high_pass_accuracy()
+        trainer.device = torch.device(
+            "cuda" if torch.cuda.is_available() else "cpu"
+        )
     trainer.save_data(
         exp_name,
         model_name,

@@ -40,6 +40,9 @@ Readings from the original paper [[https://proceedings.neurips.cc/paper/2019/fil
 1. Section 4.1
 1. Section 4.2
 2. Section 4.4
+* Questions
+- Why is the gaussian data augmentation not working ?
+- What is the fourrier transform of Gaussian noise? Gaussian noise!
 * Other experiments
 ** TODO Computing the l_1 norm distribution of the Gaussian augmentations
 The planning:
@@ -61,6 +64,3 @@ The planning:
     - High frequency accuracy
     - Low frequency accuracy
     - bandwidth
-
-  
-
