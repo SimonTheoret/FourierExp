@@ -16,6 +16,7 @@ def main_generic(
     dataset_name: str,
     batch_size: int = 1024,
     lr: float = 1e-3,
+    n_epochs: int = 300,
     adv: bool = False,
 ) -> None:
     exp_name = exp_name.lower()
@@ -60,7 +61,7 @@ def main_generic(
     trainer = GenericTrainer(
         exp_name=exp_name,
         max_epochs=1,
-        square_side_length=4, # TODO: to include in the report
+        square_side_length=4,  # TODO: to include in the report
         dataset=dataset,
         optimizer=optimizer,
         model=model,
@@ -68,7 +69,7 @@ def main_generic(
         attack=None,
     )
     print(f"device is: {trainer.device}")
-    for i in range(100):
+    for i in range(n_epochs):
         trainer.train()
         trainer.test()
         if i % 15 == 0:
@@ -91,9 +92,7 @@ def main_generic(
         trainer.device = torch.device("cpu")
         trainer.compute_fourier_low_pass_accuracy()
         trainer.compute_fourier_high_pass_accuracy()
-        trainer.device = torch.device(
-            "cuda" if torch.cuda.is_available() else "cpu"
-        )
+        trainer.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     trainer.save_data(
         exp_name,
         model_name,

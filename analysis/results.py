@@ -28,7 +28,7 @@ fourier_acc_low_dict = {}
 fourier_acc_high_dict = {}
 test_acc_dict = {}
 for exp in experiments:
-    expe_dict[exp] = torch.load("models/" + exp + "_epoch100")
+    expe_dict[exp] = torch.load("models/" + exp + "_epoch300")
     accs = expe_dict[exp]["accuracies"]
     fourier_acc_low_dict[exp + "low"] = accs["fourier_low_pass_accuracy"]
     fourier_acc_high_dict[exp + "high"] = accs["fourier_high_pass_accuracy"]
@@ -67,7 +67,7 @@ mapper_fourier = {  # TODO: update for the ADV results
 }
 
 
-index = list(range(0, 91, 15))
+index = list(range(0, 301, 15))
 fourier_low_df["index"] = index
 fourier_low_df.set_index("index")
 fourier_high_df["index"] = index
@@ -86,9 +86,10 @@ test_acc_df.rename(columns=mapper_acc, inplace=True)
 #     "rx-",
 #     "rP-",
 # ]  # TODO update for the ADV resutls
-high_list = fourier_high_df.iloc[-1].to_list()[:-1]
-low_list = fourier_low_df.iloc[-1].to_list()[:-1]
-test_acc_list = test_acc_df.iloc[90].to_list()
+
+high_list = fourier_high_df.iloc[-1].to_list()[:-1]  # ignore the index
+low_list = fourier_low_df.iloc[-1].to_list()[:-1]  # ignore the index
+test_acc_list = test_acc_df.iloc[-1].to_list()
 exp_list = list(mapper_acc.values())
 
 big_dict = {
@@ -104,11 +105,11 @@ ax = df.plot(
     y=["High Pass acc", "Low Pass Acc", "Test Acc"],
     stacked=True,
     title="Accuracy with High, low, and no frequency filter",
-    rot = 30
+    rot=30,
     # color=["red", "green", "blue"],
 )
 
-plt.savefig("assets/stacked_acc", dpi = 1000)
+plt.savefig("assets/stacked_acc", dpi=1000)
 plt.show()
 
 
