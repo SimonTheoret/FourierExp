@@ -17,7 +17,7 @@ def main_generic(
     batch_size: int = 1024,
     lr: float = 1e-3,
     n_epochs: int = 300,
-    adv: bool = False,
+    adv: bool = False,  # do we need to have an adv training ?
 ) -> None:
     exp_name = exp_name.lower()
     model_name = model_name.lower()
