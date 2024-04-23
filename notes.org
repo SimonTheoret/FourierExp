@@ -44,6 +44,7 @@ Readings from the original paper [[https://proceedings.neurips.cc/paper/2019/fil
 - Why is the gaussian data augmentation not working ?
 - What is the fourrier transform of Gaussian noise? Gaussian noise!
 * Other experiments
+** TODO Use different seeds and average
 ** TODO Computing the l_1 norm distribution of the Gaussian augmentations
 The planning:
 - Sample a few thousand vectors
@@ -64,3 +65,8 @@ The planning:
     - High frequency accuracy
     - Low frequency accuracy
     - bandwidth
+* Paper
+** TODO 
+- [ ] Better graphs
+- [ ] Params search for SGD (/lr/)
+- [ ] Random seeds + a few repetitions
