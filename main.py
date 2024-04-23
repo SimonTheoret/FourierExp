@@ -6,7 +6,7 @@ from arch.mobilevit import MobileViT
 from architecture import GenericTrainer
 from exp_datasets import AdversarialCifar10, GaussianCifar10, VanillaCifar10
 
-torch.manual_seed(42)
+torch.manual_seed(42)  # need to iterate over seeds
 
 
 def main_generic(
