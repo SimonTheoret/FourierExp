@@ -6,8 +6,9 @@ import seaborn as sns
 sns.set()
 
 # TODO: Compute the average over the 49 batches
-final_epoch = "_epoch75"
-final_seed = ""
+MAX_N_SEEDS = 6
+FINAL_EPOCH = "_epoch75"
+SEEDS_NAMES = ["_seed_" + str(i) for i in range(MAX_N_SEEDS)]
 # with open("results/allcnngaussiansgd_epoch100", "r") as f:
 experiments = [
     "allcnnvanillaadamw",
@@ -29,11 +30,13 @@ fourier_acc_low_dict = {}
 fourier_acc_high_dict = {}
 test_acc_dict = {}
 for exp in experiments:
-    expe_dict[exp] = torch.load("models/" + exp + "_epoch300")
-    accs = expe_dict[exp]["accuracies"]
-    fourier_acc_low_dict[exp + "low"] = accs["fourier_low_pass_accuracy"]
-    fourier_acc_high_dict[exp + "high"] = accs["fourier_high_pass_accuracy"]
-    test_acc_dict[exp] = accs["test_accuracy"]
+    for seedn in SEEDS_NAMES:
+        exp_seed = exp + seedn
+        expe_dict[exp_seed] = torch.load("models/" + exp + seedn + FINAL_EPOCH)
+        accs = expe_dict[exp_seed]["accuracies"]
+        fourier_acc_low_dict[exp_seed + "low"] = accs["fourier_low_pass_accuracy"]
+        fourier_acc_high_dict[exp_seed + "high"] = accs["fourier_high_pass_accuracy"]
+        test_acc_dict[exp_seed] = accs["test_accuracy"]
 
 test_acc_df = pd.DataFrame.from_dict(test_acc_dict)
 fourier_low_df = pd.DataFrame.from_dict(fourier_acc_low_dict)
