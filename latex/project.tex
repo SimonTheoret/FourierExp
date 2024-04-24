@@ -88,20 +88,22 @@ the way for exploring the Fourier space of images’ features and how
 these features are used by models. This approach was used to classify
 features in two categories: high frequency and low frequency
 features. The first category includes features such as images’
-texture, and the second is related to the countours and shapes in
-images, as stated in ~\citep{krishnamachari2023fourier}. Although high
-frequency features are often invisible to the human eye, the Fourier
-perspective showed that these features could be successfully used by
-Convolutional Neural Networks (CNN) in image classification. However,
-high frequency features are not robust, as shown by
-~\citep{zhang2019interpreting} and yet models are often biased toward
-using these features. On the contrary, low frequency features, such as
-shape, are often the preferred features of adversarially trained
-neural networks or networks trained with a Gaussian augmented
-dataset. The Fourier perspective article ~\citep{yin2020fourier}
-limited their experiments to the ResNet architecture. The lack of
-empirical research using different architectures and optimizers
-prompts the question:
+texture, and the second is related to the shapes in images, as stated
+in ~\citep{krishnamachari2023fourier}. Although high frequency
+features are often invisible to the human eye, the Fourier perspective
+showed that these features could be successfully used by Convolutional
+Neural Networks (CNN) in image classification. However, high frequency
+features are not robust, as shown by ~\citep{zhang2019interpreting}
+and yet models are often biased toward using these features. On the
+contrary, low frequency features, such as shape, are often the
+preferred features of adversarially trained neural networks or
+networks trained with a Gaussian augmented dataset. A bias toward
+shapes is not exclusive to computer vision models: it is well-known
+that object shape is the single most important cue for human object
+recognition, as discussed in ~\citep{landau}. The Fourier perspective
+article ~\citep{yin2020fourier} limited their experiments to the
+ResNet architecture. The lack of empirical research using different
+architectures and optimizers prompts the question:
 
 \textit{Does the architecture and the optimizer influence the bias
   toward low frequency features in adversari- ally trained models and
@@ -155,11 +157,11 @@ frequency signals, while CNN amplify them.
 \section{Experimental protocol}
 We are planning on using two different architectures for our
 experiments: the ALL-CNN architecture mostly consisting of stacked
-convolution layers as described by ~\citep{springenberg2015striving}, and the
-mobileViT architecture, which introduce some transformer modules into
-a CNN architecture, as described by ~\citep{mehta2022mobilevit}. We
-opted not to include pure ViT models, due to their high computational
-demands.
+convolution layers as described by ~\citep{springenberg2015striving},
+and the mobileViT architecture, which introduce some transformer
+modules into a CNN architecture, as described by
+~\citep{mehta2022mobilevit}. We opted not to include pure ViT models,
+due to their high computational demands.
 
 Our experiments consist of training a total of 12 models on the MNIST
 dataset and evaluating the performance on the validation set with only
