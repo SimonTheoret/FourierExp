@@ -128,7 +128,7 @@ class GenericTrainer(ABC):
         model_name: str,
         optim_name: str,
         dataset_name: str,
-        batch_size: int = 1024,
+        batch_size: int,
     ) -> None:
         """
         Saves the model and the collected data locally.
