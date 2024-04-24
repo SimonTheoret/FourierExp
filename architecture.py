@@ -156,6 +156,8 @@ class GenericTrainer(ABC):
         transform is calculated during the execution of this function.
         """
         batched, targets = self.dataset.test_images()
+        # TODO: this should be optimized to NOT recompute fourier transform
+        # during test on fourier:
         batched.fourier_transform_all()
         return batched, torch.tensor(targets)
 
