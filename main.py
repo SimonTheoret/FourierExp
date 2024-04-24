@@ -12,7 +12,7 @@ def main_generic(
     model_name: str,
     optim_name: str,
     dataset_name: str,
-    batch_size: int = 1024,
+    batch_size: int = 2048,
     lr: float = 1e-3,
     n_epochs: int = 75,
     adv: bool = False,  # do we need to have an adv training ?
@@ -25,7 +25,7 @@ def main_generic(
 
     for seed in range(seeds_range):
         torch.manual_seed(seed)
-        exp_name = exp_name + str(seed)
+        exp_name = exp_name + "_seed_" + str(seed)
         # Dataset selection
         if dataset_name == "vanilla":
             dataset = VanillaCifar10(batch_size=batch_size)
