@@ -17,7 +17,7 @@
 - [ ] ADV training 
 - [X] Gaussian Augmentation
 - [X] Regular training
-* DONE 
+* DONE code
 ** DONE Interfaces
 - [X] Create interfaces for moving parts
 ** DONE Building blocks
