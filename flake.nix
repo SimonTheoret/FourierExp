@@ -63,11 +63,19 @@
               numpy
               fire
               matplotlib
-              (transformers.override {torch = torch-bin; torchvision = torchvision-bin; torchaudio=torchaudio-bin;})
+              (transformers.override {
+                torch = torch-bin;
+                torchvision = torchvision-bin;
+                torchaudio = torchaudio-bin;
+              })
               pandas
               latexify-py
               seaborn
               pandas-stubs
+
+              texlive.combined.scheme-full
+              texlab
+              tectonic
             ]);
 
           # shellHook = ''

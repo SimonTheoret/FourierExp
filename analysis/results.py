@@ -6,7 +6,8 @@ import seaborn as sns
 sns.set()
 
 # TODO: Compute the average over the 49 batches
-
+final_epoch = "_epoch75"
+final_seed = ""
 # with open("results/allcnngaussiansgd_epoch100", "r") as f:
 experiments = [
     "allcnnvanillaadamw",
