@@ -14,7 +14,7 @@ def main_generic(
     dataset_name: str,
     batch_size: int = 1024,
     lr: float = 1e-3,
-    n_epochs: int = 70,
+    n_epochs: int = 75,
     adv: bool = False,  # do we need to have an adv training ?
     seeds_range: int = 6,
 ) -> None:
