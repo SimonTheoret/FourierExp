@@ -14,17 +14,18 @@ def main_generic(
     dataset_name: str,
     batch_size: int = 1024,
     lr: float = 1e-3,
-    n_epochs: int = 300,
+    n_epochs: int = 70,
     adv: bool = False,  # do we need to have an adv training ?
-    seeds_range: int = 8,
+    seeds_range: int = 6,
 ) -> None:
     exp_name = exp_name.lower()
     model_name = model_name.lower()
     optim_name = optim_name.lower()
     dataset_name = dataset_name.lower()
+
     for seed in range(seeds_range):
         torch.manual_seed(seed)
-
+        exp_name = exp_name + str(seed)
         # Dataset selection
         if dataset_name == "vanilla":
             dataset = VanillaCifar10(batch_size=batch_size)
@@ -57,7 +58,7 @@ def main_generic(
             )
             if optim_name == "adamw"
             else torch.optim.SGD(
-                model.parameters(), lr=lr, momentum=0.9, weight_decay=1e-4
+                model.parameters(), lr=0.01, momentum=0.9, weight_decay=1e-4
             )
         )
         # Trainer
