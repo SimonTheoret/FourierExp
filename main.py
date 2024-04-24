@@ -18,14 +18,14 @@ def main_generic(
     adv: bool = False,  # do we need to have an adv training ?
     seeds_range: int = 6,
 ) -> None:
-    exp_name = exp_name.lower()
+    orig_exp_name = exp_name.lower()
     model_name = model_name.lower()
     optim_name = optim_name.lower()
     dataset_name = dataset_name.lower()
 
     for seed in range(seeds_range):
         torch.manual_seed(seed)
-        exp_name = exp_name + "_seed_" + str(seed)
+        exp_name = orig_exp_name + "_seed_" + str(seed)
         # Dataset selection
         if dataset_name == "vanilla":
             dataset = VanillaCifar10(batch_size=batch_size)
