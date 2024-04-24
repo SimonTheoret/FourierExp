@@ -72,7 +72,7 @@ The planning:
 - [ ] Random seeds + a few repetitions
 ** Latex: Planning
 *** TODO Introduction
-**** TODO Contexte
+**** DONE Contexte
 - [X] done
 **** TODO Contenu
 - [ ] Include results
@@ -80,9 +80,7 @@ The planning:
 - [ ] Are the findings similar to original paper?
 *** TODO Preliminaries
 **** TODO Contexte
-- [ ] Give example of low and high frequencies features:
-  - [ ] Grass is high freq
-  - [ ] Object counter are low freq
+- [X] DONE
 **** TODO Contenu
 - [ ] Specify what is shifting freq or not (high/low)
 - [ ] if ADV: specify the attacks parameters
@@ -104,13 +102,17 @@ The planning:
 - [ ] Adversarial training is costly
 - [ ] Computing the fourier transform of images is costly too
 **** TODO Contenu
-- [ ]
+- [ ] If more experiments, add them here
+- [ ] If removing experiments, modify this
+- [ ] Quick word on limitations of the experiment
 **** TODO Conclusion
-- [ ]
+- [ ] Small paragraph like this:
+   "intuitively, this protocol allows us to check if ..."
+- [ ] Summary
 *** TODO Results
 **** TODO Vanilla
 ***** TODO Contexte
-- [ ]
+- [ ] 
 ***** TODO Contenu
 - [ ]
 ***** TODO Conclusion
@@ -131,8 +133,11 @@ The planning:
 - [ ]
 *** TODO Conclusion
 **** TODO Contexte
-- [ ]
+- [ ] Summary of experiments
 **** TODO Contenu
-- [ ]
+- [ ] What we showed
+- [ ] How does it compare to the original paper
+- [ ] Broader impact
 **** TODO Conclusion
-- [ ]
+- [ ] Limitations
+- [ ] Future works
