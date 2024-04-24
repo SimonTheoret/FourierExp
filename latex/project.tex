@@ -125,11 +125,16 @@ otherwise, we only show the magnitude of the Fourier spectrum, not the
 phase.
 
 To filter components of an image based on their frequency, we use the
-methodology of ~\citep{yin2020fourier}. We set to 0 every point in the
-Fourier spectrum that is not in the square of width B centered at the
-highest (lowest) frequency. We then apply the inverse DFT to recover
-the original image, with the low (high) frequency components filtered
-out.
+methodology of ~\citep{yin2020fourier}. When filtering the low
+frequencies, we shift the fourier transform. This transformation is
+not needed when filtering high frequencies, as they are already
+centered. We than set to 0 every point in the Fourier spectrum that is
+not in the square of width B centered at the highest (lowest)
+frequency. In the case of the high frequency filtering, we then apply
+the inverted shift. This last operation is not necessary when
+filtering the low frequencies. We then apply the inverse DFT to
+recover the original image, with the low (high) frequency components
+filtered out.
 
 Our Gaussian augmentation method follows the methodology of
 ~\citep{yin2020fourier}. We assume that pixels take values in the
@@ -140,7 +145,16 @@ $N(0, \bar{\sigma}^{2})$, is applied at each iteration and at every
 pixel. The value of $\bar{\sigma}^{2}$ is chosen uniformly at random
 from $[0, \sigma]$.
 
+In all of our experiments, we apply random flip and crops and
+normalize the images. In summary, we are trying to use
+settings and parameters as close as possible to the ones used in the
+Fourier perspective article.
+
 \section{Problem statement and related works}
+In the Fourier perspective article, the authors used a single model in
+their experiments. This factor limits the generality of their
+findings, 
+
 Our goal is to determine whether optimizers and architecture influence
 the bias in feature selection of models trained with a Gaussian
 augmented dataset or adversarially trained. Previous works have tried

@@ -82,11 +82,11 @@ The planning:
 **** TODO Contexte
 - [X] DONE
 **** TODO Contenu
-- [ ] Specify what is shifting freq or not (high/low)
+- [X] Specify what is shifting freq or not (high/low)
 - [ ] if ADV: specify the attacks parameters
-- [ ] Specify the data augmentation used (random flip + crop)
+- [X] Specify the data augmentation used (random flip + crop)
 **** TODO Conclusion
-- [ ] Settings are as similar as possible to the original paper
+- [X] Settings are as similar as possible to the original paper
 *** TODO Problem statement and related works
 **** TODO Contexte
 - [ ] Original paper had single architecture + optimizer
