@@ -1,0 +1,452 @@
+\documentclass{article}
+
+% if you need to pass options to natbib, use, e.g.:
+%  \PassOptionsToPackage{numbers, compress}{natbib} before loading
+%  neurips_2020
+
+% ready for submission \usepackage{neurips_2020}
+
+% to compile a preprint version, e.g., for submission to arXiv, add
+%  add the [preprint] option: \usepackage[preprint]{neurips_2020}
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+%  \usepackage[final]{neurips_2020}
+
+% to avoid loading the natbib package, add option nonatbib:
+\usepackage{format} \usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc} % use 8-bit T1 fonts
+%\usepackage{hyperref} % hyperlinks
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{url} % simple URL typesetting
+\usepackage{booktabs} % professional-quality tables
+\usepackage{amsfonts} % blackboard math symbols
+\usepackage{nicefrac} % compact symbols for 1/2, etc.
+\usepackage{microtype} % microtypography
+
+\title{Formatting Instructions Adversarial-ML Course}
+
+% The \author macro works with any number of authors. There are two
+%  commands used to separate the names and addresses of multiple
+%  authors: \And and \AND.  Using \And between authors leaves it to
+%  LaTeX to determine where to break the lines. Using \AND forces a
+%  line break at that point. So, if LaTeX puts 3 of 4 authors names on
+%  the first line, and the last on the second line, try using \AND
+%  instead of \And before the third author name.
+
+% \author{% David S.~Hippocampus\thanks{Use footnote for providing further information about author (webpage, alternative address)---\emph{not} for acknowledging funding agencies.}
+%   % \And
+%   % Coauthor \\
+%   % Affiliation \\
+%   % Address \\
+%   % \texttt{email} \\
+%   % \AND
+%   % Coauthor \\
+%   % Affiliation \\
+%   % Address \\
+%   % \texttt{ema\\
+%   % \And
+%   % Coauthor \\
+%   % Affiliation \\
+%   % Address \\
+%   % \texttt{email} \\
+%   % \And
+%   % Coauthor \\
+%   % Affiliation \\
+%   % Address \\
+%   % \texttt{email} \\
+% }
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+  Data augmentation is a key component to training robust models and
+  to prevent overfitting in computer vision. The Fourier perspective
+  ~\citep{yin2020fourier} gave us a better understanding of the
+  process behind such improvements by showing us the tradeoffs between
+  protecting against corruptions in low frequency and high frequency
+  and the limitations of data augmentation. These insights also raise
+  questions about the bias of gradients towards low frequencies: Does
+  the optimizer and the architecture of a model bias the model to rely
+  on low frequency features. In this work, we investigate the impact
+  of Gaussian data augmentation and adversarial training on a
+  different set of architectures and optimizers. We provide an
+  hypothesis that gradients of adversarially trained models and models
+  trained on Gaussian augmented data are naturally biased towards low
+  frequency features, as they contain more relevant information for
+  classification. To test our hypothesis, we provide an experimental
+  protocol for testing our hypothesis against different architectures
+  and optimizers by computing the accuracy of the trained models on
+  images containing either high frequency features or low frequency
+  features. We show that... % TODO: Quickly describe findings + change
+\end{abstract}
+% TODO: Change every copied citation into a real citation
+\section{Introduction}
+The Fourier perspective introduced by ~\citep{yin2020fourier} paved
+the way for exploring the Fourier space of images’ features and how
+these features are used by models. This approach was used to classify
+features in two categories: high frequency and low frequency
+features. The first category includes features such as images’
+texture, and the second is related to the countours and shapes in
+images, as stated in ~\citep{krishnamachari2023fourier}. Although high
+frequency features are often invisible to the human eye, the Fourier
+perspective showed that these features could be successfully used by
+Convolutional Neural Networks (CNN) in image classification. However,
+high frequency features are not robust, as shown by
+~\citep{zhang2019interpreting} and yet models are often biased toward
+using these features. On the contrary, low frequency features, such as
+shape, are often the preferred features of adversarially trained
+neural networks or networks trained with a Gaussian augmented
+dataset. The Fourier perspective article ~\citep{yin2020fourier}
+limited their experiments to the ResNet architecture. The lack of
+empirical research using different architectures and optimizers
+prompts the question:
+
+\textit{Does the architecture and the optimizer influence the bias
+  toward low frequency features in adversari- ally trained models and
+  models trained on Gaussian augmented datasets?}
+\section{Preliminaries}
+We use the following notations:
+$\mathcal{F}: \mathbb{R}^{d_{1} \times d_{2}} \to
+\mathbb{C}^{d_{1}\times d_{2}}$ denotes the discrete Fourier transform
+(DFT) of an image and we omit the dimensions of the channels, as every
+channel is treated independently of the other channels. For an image
+of size $N \times N$, the discrete Fourier transform is defined as
+\begin{equation}
+  \mathcal{F}(k,l) =  \sum_{i=0}^{N-1} \sum_{j=0}^{N-1}f(i,j)e^{-i2\pi(\frac{ki}{N}+\frac{lj}{N})},
+\end{equation}
+where $f(i,j)$ represents the pixel at position $i,j$ of an
+image. When we visualize the Fourier spectrum, we always shift the low
+frequency components to the center of the spectrum. Unless stated
+otherwise, we only show the magnitude of the Fourier spectrum, not the
+phase.
+
+To filter components of an image based on their frequency, we use the
+methodology of ~\citep{yin2020fourier}. We set to 0 every point in the
+Fourier spectrum that is not in the square of width B centered at the
+highest (lowest) frequency. We then apply the inverse DFT to recover
+the original image, with the low (high) frequency components filtered
+out.
+
+Our Gaussian augmentation method follows the methodology of
+~\citep{yin2020fourier}. We assume that pixels take values in the
+range $[0, 1]$. Pixel values are always clipped to this
+range. Gaussian data augmentation with parameters $\sigma$ is defined
+as the following operation: i.i.d. Gaussian noise
+$N(0, \bar{\sigma}^{2})$, is applied at each iteration and at every
+pixel. The value of $\bar{\sigma}^{2}$ is chosen uniformly at random
+from $[0, \sigma]$.
+
+\section{Problem statement and related works}
+Our goal is to determine whether optimizers and architecture influence
+the bias in feature selection of models trained with a Gaussian
+augmented dataset or adversarially trained. Previous works have tried
+to formalize the Fourier sensitivity of CNN, as explored by
+~\citep{krishnamachari2023fourier}, and gave experimental insights
+regarding the tuning of models towards certain frequencies. This has
+been explored in the works of ~\citep{krishnamachari2023fourier},
+~\citep{geirhos2022imagenettrained}, ~\citep{yin2020fourier},
+~\citep{mo2022adversarial}. Notably, the works of
+~\citep{park2022vision} demonstrated that multi-headed
+self-attentions, such as ViT (vision transformers) models, reduce high
+frequency signals, while CNN amplify them.
+
+\section{Experimental protocol}
+We are planning on using two different architectures for our
+experiments: the ALL-CNN architecture mostly consisting of stacked
+convolution layers as described by ~\citep{springenberg2015striving}, and the
+mobileViT architecture, which introduce some transformer modules into
+a CNN architecture, as described by ~\citep{mehta2022mobilevit}. We
+opted not to include pure ViT models, due to their high computational
+demands.
+
+Our experiments consist of training a total of 12 models on the MNIST
+dataset and evaluating the performance on the validation set with only
+high frequency features or low frequency features. For both the CNN
+and ViT architectures, each are trained on the default MNIST dataset,
+adversarially trained on the MNIST dataset and trained on the MNIST
+dataset with Gaussian augmentation. This procedure is repeated with
+two different optimizers. The stochastic gradient descent with
+momentum and AdamW optimizers will be used in training, as these
+optimizers were used in the original training of ALL-CNN and MobileViT
+models.
+\section{Results}
+
+\section{Conclusion}
+
+% \section{General formatting instructions}
+% \label{gen_inst}
+
+% The text must be confined within a rectangle 5.5~inches (33~picas)
+%  wide and 9~inches (54~picas) long. The left margin is 1.5~inch
+%  (9~picas).  Use 10~point type with a vertical spacing (leading) of
+%  11~points.  Times New Roman is the preferred typeface throughout,
+%  and will be selected for you by default.  Paragraphs are separated
+%  by \nicefrac{1}{2}~line space (5.5 points), with no indentation.
+
+% The paper title should be 17~point, initial caps/lower case, bold,
+%  centered between two horizontal rules. The top rule should be
+%  4~points thick and the bottom rule should be 1~point thick. Allow
+%  \nicefrac{1}{4}~inch space above and below the title to rules. All
+%  pages should start at 1~inch (6~picas) from the top of the page.
+
+% For the final version, authors' names are set in boldface, and each
+%  name is centered above the corresponding address. The lead author's
+%  name is to be listed first (left-most), and the co-authors' names
+%  (if different address) are set to follow. If there is only one
+%  co-author, list both author and co-author side by side.
+
+% Please pay special attention to the instructions in Section
+%  \ref{others} regarding figures, tables, acknowledgments, and
+%  references.
+
+% \section{Headings: first level}
+% \label{headings}
+
+% All headings should be lower case (except for first word and proper
+%  nouns), flush left, and bold.
+
+% First-level headings should be in 12-point type.
+
+% \subsection{Headings: second level}
+
+% Second-level headings should be in 10-point type.
+
+% \subsubsection{Headings: third level}
+
+% Third-level headings should be in 10-point type.
+
+% \paragraph{Paragraphs}
+
+% There is also a \verb+\paragraph+ command available, which sets the
+%  heading in bold, flush left, and inline with the text, with the
+%  heading followed by 1\,em of space.
+
+% \section{Citations, figures, tables, references}
+% \label{others}
+
+% These instructions apply to everyone.
+
+% \subsection{Citations within the text}
+
+% The \verb+natbib+ package will be loaded for you by default.
+%   Citations may be author/year or numeric, as long as you maintain
+%  internal consistency.  As to the format of the references
+%  themselves, any style is acceptable as long as it is used
+%  consistently.
+
+% The documentation for \verb+natbib+ may be found at \begin{center}
+%  \url{http://mirrors.ctan.org/macros/latex/contrib/natbib/natnotes.pdf} \end{center}
+%  Of note is the command \verb+\citet+, which produces citations
+%  appropriate for use in inline text.  For example, \begin{verbatim}
+%  \citet{hasselmo} investigated\dots \end{verbatim}
+%  produces \begin{quote} Hasselmo, et al.\ (1995)
+%  investigated\dots \end{quote}
+
+% If you wish to load the \verb+natbib+ package with options, you may
+%  add the following before loading the \verb+neurips_2020+
+%  package: \begin{verbatim}
+%  \PassOptionsToPackage{options}{natbib} \end{verbatim}
+
+% If \verb+natbib+ clashes with another package you load, you can add
+%  the optional argument \verb+nonatbib+ when loading the style
+%  file: \begin{verbatim} \usepackage[nonatbib]{format} \end{verbatim}
+
+% As submission is double blind, refer to your own published work in
+%  the third person. That is, use ``In the previous work of Jones et
+%  al.\ [4],'' not ``In our previous work [4].'' If you cite your
+%  other papers that are not widely available (e.g., a journal paper
+%  under review), use anonymous author names in the citation, e.g., an
+%  author of the form ``A.\ Anonymous.''
+
+% \subsection{Footnotes}
+
+% Footnotes should be used sparingly.  If you do require a footnote,
+%  indicate footnotes with a number\footnote{Sample of the first
+%  footnote.} in the text. Place the footnotes at the bottom of the
+%  page on which they appear.  Precede the footnote with a horizontal
+%  rule of 2~inches (12~picas).
+
+% Note that footnotes are properly typeset \emph{after} punctuation
+%  marks.\footnote{As in this example.}
+
+% \subsection{Figures}
+
+% \begin{figure}
+%   \centering
+%   \fbox{\rule[-.5cm]{0cm}{4cm} \rule[-.5cm]{4cm}{0cm}}
+%   \caption{Sample figure caption.}
+% \end{figure}
+
+% All artwork must be neat, clean, and legible. Lines should be dark
+%  enough for purposes of reproduction. The figure number and caption
+%  always appear after the figure. Place one line space before the
+%  figure caption and one line space after the figure. The figure
+%  caption should be lower case (except for first word and proper
+%  nouns); figures are numbered consecutively.
+
+% You may use color figures.  However, it is best for the figure
+%  captions and the paper body to be legible if the paper is printed
+%  in either black/white or in color.
+
+% \subsection{Tables}
+
+% All tables must be centered, neat, clean and legible.  The table
+%  number and title always appear before the table.  See
+%  Table~\ref{sample-table}.
+
+% Place one line space before the table title, one line space after
+%  the table title, and one line space after the table. The table
+%  title must be lower case (except for first word and proper nouns);
+%  tables are numbered consecutively.
+
+% Note that publication-quality tables \emph{do not contain vertical rules.} We
+% strongly suggest the use of the \verb+booktabs+ package, which allows for
+% typesetting high-quality, professional tables:
+% \begin{center}
+%   \url{https://www.ctan.org/pkg/booktabs}
+% \end{center}
+% This package was used to typeset Table~\ref{sample-table}.
+
+% \begin{table}
+%   \caption{Sample table title}
+%   \label{sample-table}
+%   \centering
+%   \begin{tabular}{lll}
+%     \toprule
+%     \multicolumn{2}{c}{Part}                   \\
+%     \cmidrule(r){1-2}
+%     Name     & Description     & Size ($\mu$m) \\
+%     \midrule
+%     Dendrite & Input terminal  & $\sim$100     \\
+%     Axon     & Output terminal & $\sim$10      \\
+%     Soma     & Cell body       & up to $10^6$  \\
+%     \bottomrule
+%   \end{tabular}
+% \end{table}
+
+% \section{Final instructions}
+
+% Do not change any aspects of the formatting parameters in the style
+%  files.  In particular, do not modify the width or length of the
+%  rectangle the text should fit into, and do not change font sizes
+%  (except perhaps in the \textbf{References} section; see
+%  below). Please note that pages should be numbered.
+
+% \section{Preparing PDF files}
+
+% Please prepare submission files with paper size ``US Letter,'' and
+%  not, for example, ``A4.''
+
+% Fonts were the main cause of problems in the past years. Your PDF
+%  file must only contain Type 1 or Embedded TrueType fonts. Here are
+%  a few instructions to achieve this.
+
+% \begin{itemize}
+
+% \item You should directly generate PDF files using \verb+pdflatex+.
+
+% \item You can check which fonts a PDF files uses.  In Acrobat
+%  Reader, select the menu Files$>$Document Properties$>$Fonts and
+%  select Show All Fonts. You can also use the program \verb+pdffonts+
+%  which comes with \verb+xpdf+ and is available out-of-the-box on
+%  most Linux machines.
+
+% \item The IEEE has recommendations for generating PDF files whose
+%  fonts are also acceptable for NeurIPS. Please see
+%  \url{http://www.emfield.org/icuwb2010/downloads/IEEE-PDF-SpecV32.pdf}
+
+% \item \verb+xfig+ "patterned" shapes are implemented with bitmap
+%  fonts.  Use "solid" shapes instead.
+
+% \item The \verb+\bbold+ package almost always uses bitmap fonts.  You should use
+%   the equivalent AMS Fonts:
+% \begin{verbatim}
+%   \usepackage{amsfonts}
+% \end{verbatim}
+% followed by, e.g., \verb+\mathbb{R}+, \verb+\mathbb{N}+, or \verb+\mathbb{C}+
+% for $\mathbb{R}$, $\mathbb{N}$ or $\mathbb{C}$.  You can also use the following
+% workaround for reals, natural and complex:
+% \begin{verbatim}
+%   \newcommand{\RR}{I\!\!R} %real numbers
+%   \newcommand{\Nat}{I\!\!N} %natural numbers
+%   \newcommand{\CC}{I\!\!\!\!C} %complex numbers
+% \end{verbatim}
+% Note that \verb+amsfonts+ is automatically loaded by the
+%  \verb+amssymb+ package.
+
+% \end{itemize}
+
+% If your file contains type 3 fonts or non embedded TrueType fonts,
+%  we will ask you to fix it.
+
+% \subsection{Margins in \LaTeX{}}
+
+% Most of the margin problems come from figures positioned by hand using
+% \verb+\special+ or other commands. We suggest using the command
+% \verb+\includegraphics+ from the \verb+graphicx+ package. Always specify the
+% figure width as a multiple of the line width as in the example below:
+% \begin{verbatim}
+%   \usepackage[pdftex]{graphicx} ...
+%   \includegraphics[width=0.8\linewidth]{myfile.pdf}
+% \end{verbatim}
+% See Section 4.4 in the graphics bundle documentation
+%  (\url{http://mirrors.ctan.org/macros/latex/required/graphics/grfguide.pdf})
+
+% A number of width problems arise when \LaTeX{} cannot properly
+%  hyphenate a line. Please give LaTeX hyphenation hints using the
+%  \verb+\-+ command when necessary.
+
+
+% \section*{Broader Impact}
+
+% Authors are encouraged to include a statement of the broader impact
+%  of their work, including its ethical aspects and future societal
+%  consequences.  Authors should discuss both positive and negative
+%  outcomes, if any. For instance, authors should discuss a) who may
+%  benefit from this research, b) who may be put at disadvantage from
+%  this research, c) what are the consequences of failure of the
+%  system, and d) whether the task/method leverages biases in the
+%  data. If authors believe this is not applicable to them, authors
+%  can simply state this.
+
+% Use unnumbered first level headings for this section, which should
+%  go at the end of the report. {\bf Note that this section does not
+%  count towards the eight pages of content that are allowed.}
+
+
+%\section*{References}
+
+%References follow the acknowledgments. Use unnumbered first-level
+% heading for the references. Any choice of citation style is
+% acceptable as long as you are consistent. It is permissible to
+% reduce the font size to \verb+small+ (9 points) when listing the
+% references.
+
+
+%\small
+
+%[1] Alexander, J.A.\ \& Mozer, M.C.\ (1995) Template-based algorithms
+% for connectionist rule extraction. In G.\ Tesauro, D.S.\ Touretzky
+% and T.K.\ Leen (eds.), {\it Advances in Neural Information
+% Processing Systems 7}, pp.\ 609--616. Cambridge, MA: MIT Press.
+
+%[2] Bower, J.M.\ \& Beeman, D.\ (1995) {\it The Book of GENESIS:
+% Exploring Realistic Neural Models with the GEneral NEural SImulation
+% System.}  New York: TELOS/Springer--Verlag.
+
+%[3] Hasselmo, M.E., Schnell, E.\ \& Barkai, E.\ (1995) Dynamics of
+% learning and recall at excitatory recurrent synapses and cholinergic
+% modulation in rat hippocampal region CA3. {\it Journal of
+% Neuroscience} {\bf 15}(7):5249-5262.
+
+
+\bibliography{references} \bibliographystyle{abbrvnat}
+
+
+\appendix
+\section{Appendix}
+You can put technical proofs and additional experiments here.
+
+\end{document}
