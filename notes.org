@@ -70,3 +70,69 @@ The planning:
 - [ ] Better graphs
 - [ ] Params search for SGD (/lr/)
 - [ ] Random seeds + a few repetitions
+** Latex: Planning
+*** TODO Introduction
+**** TODO Contexte
+- [X] done
+**** TODO Contenu
+- [ ] Include results
+**** TODO Conclusion
+- [ ] Are the findings similar to original paper?
+*** TODO Preliminaries
+**** TODO Contexte
+- [ ] Give example of low and high frequencies features:
+  - [ ] Grass is high freq
+  - [ ] Object counter are low freq
+**** TODO Contenu
+- [ ] Specify what is shifting freq or not (high/low)
+- [ ] if ADV: specify the attacks parameters
+- [ ] Specify the data augmentation used (random flip + crop)
+**** TODO Conclusion
+- [ ] Settings are as similar as possible to the original paper
+*** TODO Problem statement and related works
+**** TODO Contexte
+- [ ] Original paper had single architecture + optimizer
+- [ ] What if their findings are related to arch or optim
+**** TODO Contenu
+- [X] Bunch of related works + citations
+**** TODO Conclusion
+- [ ] Finish with something like:
+  "Here, we try to strenghten (or debunk) the findings from the
+  fourier perspective "
+*** TODO Experimental protocol
+**** TODO Contexte
+- [ ] Adversarial training is costly
+- [ ] Computing the fourier transform of images is costly too
+**** TODO Contenu
+- [ ]
+**** TODO Conclusion
+- [ ]
+*** TODO Results
+**** TODO Vanilla
+***** TODO Contexte
+- [ ]
+***** TODO Contenu
+- [ ]
+***** TODO Conclusion
+- [ ]
+**** TODO Gaussian augmented 
+***** TODO Contexte
+- [ ]
+***** TODO Contenu
+- [ ]
+***** TODO Conclusion
+- [ ]
+**** TODO Adversarial training
+***** TODO Contexte
+- [ ]
+***** TODO Contenu
+- [ ]
+***** TODO Conclusion
+- [ ]
+*** TODO Conclusion
+**** TODO Contexte
+- [ ]
+**** TODO Contenu
+- [ ]
+**** TODO Conclusion
+- [ ]
