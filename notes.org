@@ -44,12 +44,13 @@ Readings from the original paper [[https://proceedings.neurips.cc/paper/2019/fil
 - Why is the gaussian data augmentation not working ?
 - What is the fourrier transform of Gaussian noise? Gaussian noise!
 * Other experiments
-** TODO Use different seeds and average
+** DONE Use different seeds and average
 ** TODO Computing the l_1 norm distribution of the Gaussian augmentations
-The planning:
-- Sample a few thousand vectors
+The plan:
+- Sample a few thousand vectors in the shape of the images
 - Compute the l_1 norm over these vectors
-- Do a few graph, visualization
+- Do a few graph, visualization, etc.
+** TODO Computing adv trained accuracy
 ** TODO Computing accuracy with a few different bandwidth
 The planning:
 - For model /i/:
