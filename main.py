@@ -22,7 +22,7 @@ def main_generic(
     model_name: str,
     optim_name: str,
     dataset_name: str,
-    batch_size: int = 2048,
+    batch_size: int = 2048,  # TODO: change this
     lr: float = 1e-3,
     n_epochs: int = 105,
     adv: bool = False,  # do we need to have an adv training ?
@@ -33,7 +33,8 @@ def main_generic(
     model_name = model_name.lower()
     optim_name = optim_name.lower()
     dataset_name = dataset_name.lower()
-
+    if adv:
+        print("Doing adversarial training")
     for seed in range(seeds_range):
         torch.manual_seed(seed)
         exp_name = orig_exp_name + "_seed_" + str(seed)
@@ -126,7 +127,7 @@ def main_generic(
             while trainer.current_epoch < n_epochs:
                 adv_trainer.fit(x=data, y=labels, nb_epochs=1)
                 trainer.test()
-                if trainer.current_epoch % 15 == 0:
+                if trainer.current_epoch % 15 == 0 or trainer.current_epoch == 1:
                     with torch.no_grad():
                         trainer.device = torch.device("cpu")
                         trainer.compute_fourier_low_pass_accuracy()
@@ -161,7 +162,7 @@ def main_generic(
             while trainer.current_epoch < n_epochs:
                 trainer.train()
                 trainer.test()
-                if trainer.current_epoch % 15 == 0:
+                if trainer.current_epoch % 15 == 0 or trainer.current_epoch == 1:
                     with torch.no_grad():
                         trainer.device = torch.device("cpu")
                         trainer.compute_fourier_low_pass_accuracy()
