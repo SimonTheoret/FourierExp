@@ -1,3 +1,12 @@
+from typing import Optional
+import numpy as np
+from torch.utils.data import DataLoader
+
+from art.estimators.classification import PyTorchClassifier
+from art.data_generators import PyTorchDataGenerator
+from art.defences.trainer import AdversarialTrainerMadryPGD
+from art.attacks.evasion import ProjectedGradientDescent
+
 import torch
 from torchinfo import summary
 
@@ -14,9 +23,10 @@ def main_generic(
     dataset_name: str,
     batch_size: int = 2048,
     lr: float = 1e-3,
-    n_epochs: int = 75,
+    n_epochs: int = 105,
     adv: bool = False,  # do we need to have an adv training ?
     seeds_range: int = 6,
+    from_checkpoint: Optional[int] = None,
 ) -> None:
     orig_exp_name = exp_name.lower()
     model_name = model_name.lower()
@@ -61,6 +71,7 @@ def main_generic(
                 model.parameters(), lr=0.01, momentum=0.9, weight_decay=1e-4
             )
         )
+
         # Trainer
         trainer = GenericTrainer(
             exp_name=exp_name,
@@ -72,41 +83,98 @@ def main_generic(
             loss_func=loss_func,
             attack=None,
         )
+        if from_checkpoint is not None:
+            trainer.load_data(from_checkpoint)
+
         print(f"device is: {trainer.device}")
 
-        for i in range(n_epochs):
-            trainer.train()
-            trainer.test()
-            if i % 15 == 0:
-                with torch.no_grad():
-                    trainer.device = torch.device("cpu")
-                    trainer.compute_fourier_low_pass_accuracy()
-                    trainer.compute_fourier_high_pass_accuracy()
-                    trainer.device = torch.device(
-                        "cuda" if torch.cuda.is_available() else "cpu"
-                    )
-                trainer.save_data(
-                    exp_name,
-                    model_name,
-                    optim_name,
-                    dataset_name,
-                    batch_size,
-                )
-
-        with torch.no_grad():
-            trainer.device = torch.device("cpu")
-            trainer.compute_fourier_low_pass_accuracy()
-            trainer.compute_fourier_high_pass_accuracy()
-            trainer.device = torch.device(
-                "cuda" if torch.cuda.is_available() else "cpu"
+        if adv:
+            classifier = PyTorchClassifier(
+                model=trainer.model,
+                clip_values=(0.0, 1.0),
+                preprocessing=None,
+                loss=loss_func,
+                optimizer=trainer.optimizer,
+                input_shape=(3, 32, 32),
+                nb_classes=10,
             )
-        trainer.save_data(
-            exp_name,
-            model_name,
-            optim_name,
-            dataset_name,
-            batch_size,
-        )
+
+            epsilon = 8.0 / 255.0
+            adv_trainer = AdversarialTrainerMadryPGD(classifier, eps=epsilon)
+
+            # # Build a Keras image augmentation object and wrap it in ART
+            # assert dataset.train_dataloader is not None
+            # art_datagen = PyTorchDataGenerator(
+            #     iterator=dataset.train_dataloader,
+            #     size=len(dataset.train_dataloader) * batch_size,
+            #     batch_size=batch_size,
+            # )
+
+            # Step 5: fit the trainer
+            assert trainer.dataset.train_dataset is not None
+
+            # hack to make have data as a numpy array with the transforms:
+            new_train_dataloader = DataLoader(
+                trainer.dataset.train_dataset,
+                batch_size=len(trainer.dataset.train_dataset),
+            )
+            data = next(iter(new_train_dataloader))[0].numpy()
+            labels = next(iter(new_train_dataloader))[1].numpy()
+            # hack has ended
+
+            while trainer.current_epoch < n_epochs:
+                adv_trainer.fit(x=data, y=labels, nb_epochs=1)
+                trainer.test()
+                if trainer.current_epoch % 15 == 0:
+                    with torch.no_grad():
+                        trainer.device = torch.device("cpu")
+                        trainer.compute_fourier_low_pass_accuracy()
+                        trainer.compute_fourier_high_pass_accuracy()
+                        trainer.device = torch.device(
+                            "cuda" if torch.cuda.is_available() else "cpu"
+                        )
+                    trainer.save_data(
+                        exp_name,
+                        model_name,
+                        optim_name,
+                        dataset_name,
+                        batch_size,
+                    )
+
+        if not adv:
+            while trainer.current_epoch < n_epochs:
+                trainer.train()
+                trainer.test()
+                if trainer.current_epoch % 15 == 0:
+                    with torch.no_grad():
+                        trainer.device = torch.device("cpu")
+                        trainer.compute_fourier_low_pass_accuracy()
+                        trainer.compute_fourier_high_pass_accuracy()
+                        trainer.device = torch.device(
+                            "cuda" if torch.cuda.is_available() else "cpu"
+                        )
+                    trainer.save_data(
+                        exp_name,
+                        model_name,
+                        optim_name,
+                        dataset_name,
+                        batch_size,
+                    )
+
+            with torch.no_grad():
+                trainer.device = torch.device("cpu")
+                trainer.compute_fourier_low_pass_accuracy()
+                trainer.compute_fourier_high_pass_accuracy()
+                trainer.device = torch.device(
+                    "cuda" if torch.cuda.is_available() else "cpu"
+                )
+            trainer.save_data(
+                exp_name,
+                model_name,
+                optim_name,
+                dataset_name,
+                batch_size,
+            )
 
 
 if __name__ == "__main__":

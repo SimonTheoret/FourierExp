@@ -16,7 +16,7 @@ from torchvision.transforms import (
     RandomHorizontalFlip,
     RandomVerticalFlip,
     ToTensor,
-    Normalize
+    Normalize,
 )
 
 from utils.images import BatchedImages, Image
@@ -111,7 +111,7 @@ class Cifar10(Dataset):
     train_dataloader: Optional[DataLoader] = None
     test_dataloader: Optional[DataLoader] = None
     default_transformations: list[Callable[[torch.Tensor], torch.Tensor]] = field(
-        default_factory=lambda: [ #NOTE: included in the final report
+        default_factory=lambda: [  # NOTE: included in the final report
             # RandomCrop(size=32),  # size of the image (3x32x32)
             RandomHorizontalFlip(),
             RandomVerticalFlip(),
@@ -316,9 +316,7 @@ class Cifar10(Dataset):
         data = []
         targets = []
         assert train_dl is not None
-        for i, (data_point, target) in enumerate(
-            train_dl  
-        ):
+        for i, (data_point, target) in enumerate(train_dl):
             if i == 0:
                 assert isinstance(data_point, torch.Tensor)
             dim = tuple(list(data_point.size()))

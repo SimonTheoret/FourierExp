@@ -88,7 +88,8 @@ class GenericTrainer(ABC):
         self,
     ) -> None:
         """
-        Tests the model.
+        Tests the model. It increments the internal epoch counter
+        `current_epoch` by 1.
         """
         print("Testing started")
         self.model.eval()
@@ -148,6 +149,14 @@ class GenericTrainer(ABC):
             },
             self.save_dir + self.exp_name + f"_epoch{self.current_epoch}",
         )
+
+    def load_data(self, epoch: int) -> None:
+        data = torch.load(self.save_dir + self.exp_name + f"_epoch{epoch}")
+        self.current_epoch = data["current_epoch"] + 1
+        self.model.load_state_dict(data["model_state_dict"])
+        self.optimizer.load_state_dict(data["optimizer_state_dict"])
+        self.losses = data["losses"]
+        self.accuracies = data["accuracies"]
 
     def batched_images(self) -> Tuple[BatchedImages, torch.Tensor]:
         """
