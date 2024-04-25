@@ -191,17 +191,9 @@ def main_generic(
                 dataset_name,
                 batch_size,
             )
-    torch.cuda.empty_cache()
-    gc.collect()
 
 
 if __name__ == "__main__":
     from fire import Fire
 
-    torch.cuda.empty_cache()
-    gc.collect()
-
     Fire(main_generic)
-
-    torch.cuda.empty_cache()
-    gc.collect()
