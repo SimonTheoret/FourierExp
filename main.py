@@ -1,4 +1,5 @@
 from typing import Optional
+import gc
 import numpy as np
 from torch.utils.data import DataLoader
 
@@ -141,6 +142,21 @@ def main_generic(
                         batch_size,
                     )
 
+            with torch.no_grad():
+                trainer.device = torch.device("cpu")
+                trainer.compute_fourier_low_pass_accuracy()
+                trainer.compute_fourier_high_pass_accuracy()
+                trainer.device = torch.device(
+                    "cuda" if torch.cuda.is_available() else "cpu"
+                )
+            trainer.save_data(
+                exp_name,
+                model_name,
+                optim_name,
+                dataset_name,
+                batch_size,
+            )
+
         if not adv:
             while trainer.current_epoch < n_epochs:
                 trainer.train()
@@ -175,9 +191,17 @@ def main_generic(
                 dataset_name,
                 batch_size,
             )
+    torch.cuda.empty_cache()
+    gc.collect()
 
 
 if __name__ == "__main__":
     from fire import Fire
 
+    torch.cuda.empty_cache()
+    gc.collect()
+
     Fire(main_generic)
+
+    torch.cuda.empty_cache()
+    gc.collect()
