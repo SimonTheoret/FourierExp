@@ -51,6 +51,9 @@ The plan:
 - Compute the l_1 norm over these vectors
 - Do a few graph, visualization, etc.
 ** TODO Computing adv trained accuracy
+** TODO Overfit model
+Why? overfitting = learning not generalizable features. When
+overfitting, does it mean we are learningi high frequency features?
 ** TODO Computing accuracy with a few different bandwidth
 The planning:
 - For model /i/:
@@ -79,33 +82,34 @@ The planning:
 - [ ] Include results
 **** TODO Conclusion
 - [ ] Are the findings similar to original paper?
+- [ ] Is it suprising
 *** TODO Preliminaries
-**** TODO Contexte
+**** DONE Contexte
 - [X] DONE
-**** TODO Contenu
+**** DONE Contenu
 - [X] Specify what is shifting freq or not (high/low)
-- [ ] if ADV: specify the attacks parameters
+- [X] if ADV: specify the attacks parameters
 - [X] Specify the data augmentation used (random flip + crop)
-**** TODO Conclusion
+**** DONE Conclusion
 - [X] Settings are as similar as possible to the original paper
 *** TODO Problem statement and related works
 **** TODO Contexte
-- [ ] Original paper had single architecture + optimizer
-- [ ] What if their findings are related to arch or optim
+- [X] Original paper had single architecture + optimizer
+- [X] What if their findings are related to arch or optim
 **** TODO Contenu
 - [X] Bunch of related works + citations
 **** TODO Conclusion
-- [ ] Finish with something like:
+- [X] Finish with something like:
   "Here, we try to strenghten (or debunk) the findings from the
   fourier perspective "
 *** TODO Experimental protocol
 **** TODO Contexte
-- [ ] Adversarial training is costly
+- [X] Adversarial training is costly
 - [ ] Computing the fourier transform of images is costly too
 **** TODO Contenu
 - [ ] If more experiments, add them here
 - [ ] If removing experiments, modify this
-- [ ] Quick word on limitations of the experiment
+- [X] Small paragraph about hyperparameters used during training
 **** TODO Conclusion
 - [ ] Small paragraph like this:
    "intuitively, this protocol allows us to check if ..."
