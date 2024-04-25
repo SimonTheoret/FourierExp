@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass{article} \author{Simon Théorêt}
 
 % if you need to pass options to natbib, use, e.g.:
 %  \PassOptionsToPackage{numbers, compress}{natbib} before loading
@@ -106,8 +106,12 @@ ResNet architecture. The lack of empirical research using different
 architectures and optimizers prompts the question:
 
 \textit{Does the architecture and the optimizer influence the bias
-  toward low frequency features in adversari- ally trained models and
+  toward low frequency features in adversarially trained models and
   models trained on Gaussian augmented datasets?}
+
+Having an answer to this question could help us in selecting robust
+model for security sensitive applications or in building robust model
+without suffering the full cost of adversarial training.
 \section{Preliminaries}
 We use the following notations:
 $\mathcal{F}: \mathbb{R}^{d_{1} \times d_{2}} \to
@@ -146,14 +150,18 @@ pixel. The value of $\bar{\sigma}^{2}$ is chosen uniformly at random
 from $[0, \sigma]$.
 
 In all of our experiments, we apply random flip and crops and
-normalize the images. In summary, we are trying to use
-settings and parameters as close as possible to the ones used in the
-Fourier perspective article.
+normalize the images. In summary, we are trying to use settings and
+parameters as close as possible to the ones used in the Fourier
+perspective article.
 
 \section{Problem statement and related works}
 In the Fourier perspective article, the authors used a single model in
-their experiments. This factor limits the generality of their
-findings, 
+their experiments. This factor limits the generality of their findings
+and raises the natural question: Are their results artifacts of the
+optimizer or the WideResNet architecture? By expanding the number of
+architecture optimizers used for training and testing, we show that
+\textbf{insert results here}, which is \textbf{in accord or not} with
+the Fourier perspective results.
 
 Our goal is to determine whether optimizers and architecture influence
 the bias in feature selection of models trained with a Gaussian
@@ -166,7 +174,9 @@ been explored in the works of ~\citep{krishnamachari2023fourier},
 ~\citep{mo2022adversarial}. Notably, the works of
 ~\citep{park2022vision} demonstrated that multi-headed
 self-attentions, such as ViT (vision transformers) models, reduce high
-frequency signals, while CNN amplify them.
+frequency signals, while CNN amplify them. Here, we are showing that
+the results of ~\citep{yin2020fourier} are \textbf{ARE WHAT} of the
+architecture and the optimizer.
 
 \section{Experimental protocol}
 We are planning on using two different architectures for our
@@ -188,8 +198,29 @@ momentum and AdamW optimizers will be used in training, as these
 optimizers were used in the original training of ALL-CNN and MobileViT
 models.
 
-\section{Results}
+\subsection*{Hyperparameters}
+Here we document our chosen set of hyperparameters, used during our
+experiments. When training with the SGD algorithm, we used a learning
+rate of 0.01, whereas we used a learning rate of 0.001 when training
+with AdamW. Each experiment was a duration of 105 epochs and the
+results were averaged over 6 different seeds. We used a bandwitdth $B$
+of length 4 to filter the high and low frequencies. This is to say we
+covered the center of the fourier transform of the images with a
+square with side of length 4. Each models were trained with the
+cross-entropy loss function. When applying Gaussian data augmentation,
+we used $\bar{\sigma} = 0.1$, which was the reported value in the
+Fourier perspective article. For adversarial training, we used
+$\varepsilon = 8/255$ coupled with projected gradient descent
+(PGD). Our adversarial training used an attack step size of 2 with a
+maximum of 7 iterations.
 
+Intuitively, this protocol allows us to test the sensibility of
+certain models optimizer to low and high frequencies features and
+observe how this sensibility evolves during training.
+
+\section{Results}
+\subsection{Gaussian data augmentation}
+\subsection{Overfitting}
 \section{Conclusion}
 
 % \section{General formatting instructions}
