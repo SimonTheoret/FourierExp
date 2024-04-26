@@ -7,8 +7,10 @@ import seaborn as sns
 sns.set()
 
 # TODO: Compute the average over the 49 batches
+MISSING_ACCS = True
 MAX_N_SEEDS = 6
 FINAL_EPOCH = "_epoch105"
+SECONDARY_EPOCH = "_epoch75"
 FINAL_EPOCH_N = 105
 SEEDS_NAMES = ["_seed_" + str(i) for i in range(MAX_N_SEEDS)]
 # with open("results/allcnngaussiansgd_epoch100", "r") as f:
@@ -27,6 +29,7 @@ experiments = [
     # "mobilevitsgdadv",
 ]
 expe_dict = {}
+second_dict = {}
 fourier_acc_low_dict = {}
 fourier_acc_high_dict = {}
 test_acc_dict = {}
@@ -34,10 +37,20 @@ for exp in experiments:
     for seed_num in SEEDS_NAMES:
         exp_seed = exp + seed_num
         expe_dict[exp_seed] = torch.load("models/" + exp + seed_num + FINAL_EPOCH)
+        second_dict[exp_seed] = torch.load("models/" + exp + seed_num + SECONDARY_EPOCH)
         accs = expe_dict[exp_seed]["accuracies"]
-        fourier_acc_low_dict[exp_seed + "low"] = accs["fourier_low_pass_accuracy"]
-        fourier_acc_high_dict[exp_seed + "high"] = accs["fourier_high_pass_accuracy"]
-        test_acc_dict[exp_seed] = accs["test_accuracy"]
+        second_accs = second_dict[exp_seed]["accuracies"]
+        fourier_acc_low_dict[exp_seed + "low"] = second_accs[
+            "fourier_low_pass_accuracy"
+        ]   + accs["fourier_low_pass_accuracy"][1:]
+        fourier_acc_high_dict[exp_seed + "high"] = (
+            second_accs["fourier_high_pass_accuracy"]
+             + accs["fourier_high_pass_accuracy"][1:]
+        )
+        test_acc_dict[exp_seed] = second_accs[
+            "test_accuracy"
+        ]   + accs["test_accuracy"]
+
 
 test_acc_df = pd.DataFrame.from_dict(test_acc_dict)
 fourier_low_df = pd.DataFrame.from_dict(fourier_acc_low_dict)
@@ -102,9 +115,9 @@ def mapper_func(name: str):
 
 
 index = list(range(0, FINAL_EPOCH_N + 1, 15))
-assert len(index) == 7
+print(index)
+assert len(index) == 8
 assert index[-1] == 105
-
 fourier_low_df["index"] = index
 fourier_low_df.set_index("index")
 fourier_high_df["index"] = index
@@ -122,10 +135,7 @@ test_acc_df.rename(columns=mapper_func, inplace=True)
 #     "rP--",
 #     "rx-",
 #     "rP-",
-# ]  # TODO update for the ADV resutls
-# def avg_col(df: pd.DataFrame, start:int, end:int):
-#     df = df.drop(columns=["index"])
-#     return df.iloc[:, start:end].mean(axis = 1)
+# ]
 
 
 def avg_col(df: pd.DataFrame, contains: str):
