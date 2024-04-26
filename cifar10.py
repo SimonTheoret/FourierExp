@@ -280,12 +280,22 @@ class Cifar10(Dataset):
             targets.append(target.numpy())
         return np.array(data), np.array(targets)
 
-    def test_images(self) -> tuple[BatchedImages, np.ndarray]:
-        """Returns the test data as a BatchedImages object. It
-        returns the data and the targets in a tuple."""
+    def test_images(self, dataset: bool = True) -> tuple[BatchedImages, np.ndarray]:
+        """Returns the test data as a BatchedImages object. It returns
+        the data and the targets in a tuple. If dataset is `True`,
+        returns the images from the dataset. Else, it returns it from
+        the dataloader."""
         assert self.test_dataset is not None
         data = []
-        test_dl = copy(self.test_dataset)
+        if dataset:
+            test_dl = copy(self.test_dataset)
+        else:
+            test_dl = DataLoader(
+                self.test_dataset,
+                batch_size=1,
+                num_workers=4,
+                shuffle=False,
+            )
         targets = []
         assert test_dl is not None
         for i, (data_point, target) in enumerate(

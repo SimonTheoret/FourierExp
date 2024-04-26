@@ -156,8 +156,8 @@ class GenericTrainer(ABC):
         self.model.load_state_dict(data["model_state_dict"])
         self.model.to(self.device)
         self.optimizer.load_state_dict(data["optimizer_state_dict"])
-        self.losses = data["losses"]
-        self.accuracies = data["accuracies"]
+        self.all_losses = data["losses"]
+        self.all_accuracies = data["accuracies"]
 
     def batched_images(self) -> Tuple[BatchedImages, torch.Tensor]:
         """

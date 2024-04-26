@@ -143,8 +143,8 @@ class Image:
 @dataclass(init=False)
 class BatchedImages(Image):
     """
-    Class for the batched images. It contains a dictionary mapping the
-    original images to their fourier transformations.
+    Class for the batched images. It contains the original images, the
+    filtered images with low or high fourier pass and the tensor images.
     """
 
     dim: tuple[int, int, int, int]

@@ -1,12 +1,8 @@
 from typing import Optional
-import gc
-import numpy as np
 from torch.utils.data import DataLoader
 
 from art.estimators.classification import PyTorchClassifier
-from art.data_generators import PyTorchDataGenerator
 from art.defences.trainer import AdversarialTrainerMadryPGD
-from art.attacks.evasion import ProjectedGradientDescent
 
 import torch
 from torchinfo import summary
@@ -125,16 +121,15 @@ def main_generic(
             # hack has ended
 
             while trainer.current_epoch < n_epochs:
-                adv_trainer.fit(x=data, y=labels, nb_epochs=1)
+                trainer.device = torch.device("cpu")
+                adv_trainer.fit(x=data, y=labels, nb_epochs=1, device = "cpu")
                 trainer.test()
                 if trainer.current_epoch % 15 == 0 or trainer.current_epoch == 1:
                     with torch.no_grad():
                         trainer.device = torch.device("cpu")
                         trainer.compute_fourier_low_pass_accuracy()
                         trainer.compute_fourier_high_pass_accuracy()
-                        trainer.device = torch.device(
-                            "cuda" if torch.cuda.is_available() else "cpu"
-                        )
+
                     trainer.save_data(
                         exp_name,
                         model_name,
@@ -147,9 +142,7 @@ def main_generic(
                 trainer.device = torch.device("cpu")
                 trainer.compute_fourier_low_pass_accuracy()
                 trainer.compute_fourier_high_pass_accuracy()
-                trainer.device = torch.device(
-                    "cuda" if torch.cuda.is_available() else "cpu"
-                )
+
             trainer.save_data(
                 exp_name,
                 model_name,
