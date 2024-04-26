@@ -22,6 +22,8 @@
 \usepackage{amsfonts} % blackboard math symbols
 \usepackage{nicefrac} % compact symbols for 1/2, etc.
 \usepackage{microtype} % microtypography
+\usepackage{graphicx} \usepackage{caption} \usepackage{subcaption}
+\usepackage{float}
 
 \title{Formatting Instructions Adversarial-ML Course}
 
@@ -187,13 +189,13 @@ modules into a CNN architecture, as described by
 ~\citep{mehta2022mobilevit}. We opted not to include pure ViT models,
 due to their high computational demands.
 
-Our experiments consist of training a total of 12 models on the MNIST
-dataset and evaluating the performance on the validation set with only
-high frequency features or low frequency features. For both the CNN
-and ViT architectures, each are trained on the default MNIST dataset,
-adversarially trained on the MNIST dataset and trained on the MNIST
-dataset with Gaussian augmentation. This procedure is repeated with
-two different optimizers. The stochastic gradient descent with
+Our experiments consist of training a total of 12 models on the
+CIFAR10 dataset and evaluating the performance on the validation set
+with only high frequency features or low frequency features. For both
+the CNN and ViT architectures, each are trained on the default CIFAR10
+dataset, adversarially trained on the MNIST dataset and trained on the
+MNIST dataset with Gaussian augmentation. This procedure is repeated
+with two different optimizers. The stochastic gradient descent with
 momentum and AdamW optimizers will be used in training, as these
 optimizers were used in the original training of ALL-CNN and MobileViT
 models.
@@ -214,13 +216,45 @@ $\varepsilon = 8/255$ coupled with projected gradient descent
 (PGD). Our adversarial training used an attack step size of 2 with a
 maximum of 7 iterations.
 
-Intuitively, this protocol allows us to test the sensibility of
-certain models optimizer to low and high frequencies features and
-observe how this sensibility evolves during training.
+Intuitively, this protocol allows us to test the sensibility models
+and optimizers to low and high frequencies features and observe how
+this sensibility evolves during regular training and Gaussian
+augmented training.
 
 \section{Results}
+In the following section, we present the results of our
+experiments. Although both high frequencies and low frequencies
+features are useful for classification, not every model and optimizer
+treat these frequencies the same way. We obtain conflicting and
+perhaps surprising results with what was reported in the Fourier
+perspective paper ~\citep{yin2020fourier}.
+
+\subsection{Architecture and optimizer comparison}
+We observed an interesting trend in the behavior during training. Most
+notably, all models were continuously learning to rely on low
+frequency features. 
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.6]{assets/avg\_high\_pass\_fourier\_test\_acc.png}
+  \caption{Averaged accuracy on the test set after filtering out high frequencies
+    components over 6 different random seeds}
+	\label{fig:lowerror}
+\end{figure}
+
+% \begin{figure}
+%   \centering
+%   \includegraphics[scale=0.6]{assets/avg\_high\_pass\_fourier\_test\_acc.png}
+%   \caption{Accuracy on the test set after filtering high frequencies
+%     components}
+% 	\label{fig:higherror}
+% \end{figure}
+
+
+
 \subsection{Gaussian data augmentation}
 \subsection{Overfitting}
+
 \section{Conclusion}
 
 % \section{General formatting instructions}
