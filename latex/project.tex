@@ -25,7 +25,7 @@
 \usepackage{graphicx} \usepackage{caption} \usepackage{subcaption}
 \usepackage{float}
 
-\title{Formatting Instructions Adversarial-ML Course}
+\title{The Fourier perspective and the frequency bias}
 
 % The \author macro works with any number of authors. There are two
 %  commands used to separate the names and addresses of multiple
@@ -230,17 +230,24 @@ perhaps surprising results with what was reported in the Fourier
 perspective paper ~\citep{yin2020fourier}.
 
 \subsection{Architecture and optimizer comparison}
-We observed an interesting trend in the behavior during training. Most
-notably, all models were continuously learning to rely on low
-frequency features. 
+Here, we show our results with the AdamW and SGD optimizers, the
+MobileVit and ALL-CNN architectures, and the regular and Gaussian
+augmented training regimen.  We trained for 105 epochs the 8 possibles
+configurations over 6 different seeds. We show the average results of
+the runs.  We observed surprising trends in the behavior during
+training. Notably, all models were continuously learning to mostly rely
+on low frequency features, independently of the training regimen. This
+contradicts the findings of ~\citep{yin2020fourier}
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
-  \includegraphics[scale=0.6]{assets/avg\_high\_pass\_fourier\_test\_acc.png}
-  \caption{Averaged accuracy on the test set after filtering out high frequencies
-    components over 6 different random seeds}
+  \includegraphics[scale=0.7]{assets/avg\_high\_pass\_fourier\_test\_acc.png}
+  \caption{Averaged accuracy on the test set after filtering out high
+    frequencies components. Results are averaged over 6 different
+    random seeds}
 	\label{fig:lowerror}
 \end{figure}
+
 
 % \begin{figure}
 %   \centering

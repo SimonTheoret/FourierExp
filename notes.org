@@ -129,12 +129,12 @@ that are concentrated in the low frequency domain. *The two*
 *** TODO Results
 **** TODO Architecture and optimizers
 ***** TODO Contexte
-- [ ] We tried 8 experiments:
-  - [ ] 2 optimizer
-  - [ ] 2 models
-  - [ ] 2 training regimen (is it a word?)
-- [ ] 6 seeds for each experiments:
-  - [ ] average results are presented.
+- [X] We tried 8 experiments:
+  - [X] 2 optimizer
+  - [X] 2 models
+  - [X] 2 training regimen (is it a word?)
+- [X] 6 seeds for each experiments:
+  - [X] average results are presented.
 ***** TODO Contenu
 - [ ] Suprising results, contradiction to what Fourier perspective
   reported
@@ -175,6 +175,8 @@ that are concentrated in the low frequency domain. *The two*
   - [ ] Visualize distribution of gaussian noise in fourier transform space
 ***** TODO Conclusion
 - [ ] Gaussian augmentation is no bueno
+- [ ] Experimentally: does not work. There is too much information in
+  high frequency.
 *** TODO Conclusion
 **** TODO Contexte
 - [ ] Summary of experiments
@@ -187,3 +189,5 @@ that are concentrated in the low frequency domain. *The two*
 **** TODO Conclusion
 - [ ] Limitations
 - [ ] Future works
+** TODO Remove every mention of adversarial training 
+** TODO Explain why no adv 
