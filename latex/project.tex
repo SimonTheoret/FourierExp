@@ -235,32 +235,101 @@ MobileVit and ALL-CNN architectures, and the regular and Gaussian
 augmented training regimen.  We trained for 105 epochs the 8 possibles
 configurations over 6 different seeds. We show the average results of
 the runs.  We observed surprising trends in the behavior during
-training. Notably, all models were continuously learning to mostly rely
-on low frequency features, independently of the training regimen. This
-contradicts the findings of ~\citep{yin2020fourier}
+training. Notably, all models were continuously learning to mostly
+rely on low frequency features, independently of the training
+regimen. This contradicts the findings of ~\citep{yin2020fourier},
+where they reported how models trained with Gaussian data augmentation
+are biased toward low frequency features when compared to models
+trained in a regular fashion. The results for the testing accuracy can
+be found in the appendix \ref{fig:testacc}.
 
-\begin{figure}[H]
+\subsubsection*{AdamW relies more on low frequency features}
+Surprisingly, the model's architecture does not seem to be a
+significant factor in predicting the behavior during training.
+However, we can notice how models trained with AdamW relied on low
+frequency features at least as much as models trained with stochastic
+gradient descent. This is in accordance to the experimental
+observations that AdamW often selects more generalizable features than
+its SGD counterpart, and that low frequency features are often useful
+features for generalization.
+
+\begin{figure}[h]
   \centering
   \includegraphics[scale=0.7]{assets/avg\_high\_pass\_fourier\_test\_acc.png}
   \caption{Averaged accuracy on the test set after filtering out high
     frequencies components. Results are averaged over 6 different
-    random seeds}
+    random seeds.}
+	\label{fig:higherror}
+\end{figure}
+% TODO: rework the last sentence
+
+\subsubsection*{Gaussian augmentation make models reliant on high
+  frequencies features }
+Contrary to the reported results of the Fourier perspective paper,
+every model trained with Gaussian data augmentation relied less on low
+frequency features than it's vanilla counterpart. In fact, models
+trained under the Gaussian augmentation regimen were most prone to
+using high frequency features, as is shown in the figure
+\ref{fig:lowerror}. In fact, models trained under a standard regimen
+did not learn to use high frequency features: most of their
+performance is similar to the performance of a random classifier. On
+the opposite, ViT models with Gaussian augmented data achieved nearly
+27\% accuracy, and most models achieving over 20\% accuracy. This
+shows that models trained with Gaussian augmentation are not less
+reliant on high frequency features, but in fact are more reliant on
+these high frequency features.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[scale=0.7]{assets/avg\_low\_pass\_fourier\_test\_acc.png}
+  \caption{Accuracy on the test set after filtering out low
+    frequencies components. Results are averaged over 6 different
+    random seeds.}
 	\label{fig:lowerror}
 \end{figure}
 
-
-% \begin{figure}
-%   \centering
-%   \includegraphics[scale=0.6]{assets/avg\_high\_pass\_fourier\_test\_acc.png}
-%   \caption{Accuracy on the test set after filtering high frequencies
-%     components}
-% 	\label{fig:higherror}
-% \end{figure}
-
-
+Overall, our result are in stark contrast to what
+~\citep{yin2020fourier} reported in their paper.
 
 \subsection{Gaussian data augmentation}
-\subsection{Overfitting}
+In the Fourier perspective paper, the authors explain why they believe
+Gaussian augmentation makes models rely more heavily on low frequency
+features. They hypothesize, that because natural images have higher
+concentrations in the low frequencies and Gaussian noise is uniformly
+distributed across the Fourier frequencies and thus has much higher
+frequency statistics relative to natural images. Therefore, the added
+noise will make the model invariant with respect to the high
+frequencies. In our case, this explanation does not seem to hold, as
+stated in the previous section.
+
+We hypothesize that their premise is wrong: although natural images
+have a higher concentration in the lower frequencies, there are still
+some relevant information contained in the higher frequencies of an
+image. Therefore, the added noise does not necessarily mean the model
+will learn to ignore the high frequency features. To back our
+hypothesis, we have computed the average frequencies values over the
+test set, with and without Gaussian augmentation:
+
+
+\begin{figure}[h]
+  \centering
+  % \begin{subfigure}[b]{0.45\textwidth}
+  % \centering
+  % \includegraphics[width=\textwidth]{assets/freq\_fourier\_transf\_gaussian.png}
+  % \caption{}
+  % \label{fig:fouriergaussianfreq}
+  % \end{subfigure}
+  % \begin{subfigure}[b]{0.45\textwidth}
+  % \centering
+  \includegraphics[scale =
+    0.7]{assets/freq\_fourier\_transf\_vanilla.png}
+  \caption{Average frequencies of test set without any Gaussian
+    augmentation. Although the lower frequencies prime over the higher
+    ones, an important proportion of a CIFAR10 image will still be
+    mapped to high frequencies}
+	\label{fig:fouriervanillafreq}
+	% \end{subfigure}
+\end{figure}
 
 \section{Conclusion}
 
@@ -536,6 +605,14 @@ contradicts the findings of ~\citep{yin2020fourier}
 
 \appendix
 \section{Appendix}
-You can put technical proofs and additional experiments here.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.7]{assets/avg\_test\_accuracy.png}
+  \caption{Averaged accuracy on the test set after filtering out high
+    frequencies components. Results are averaged over 6 different
+    random seeds}
+	\label{fig:testacc}
+\end{figure}
 
 \end{document}

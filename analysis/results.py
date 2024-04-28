@@ -173,6 +173,8 @@ print(avg_acc_df)
 avg_acc_df = {i[0]: i[1].to_numpy() for i in avg_acc_df if i[1] is not None}
 avg_acc_df = pd.DataFrame.from_dict(avg_acc_df)
 
+# print(avg_low_fourier_df/avg_acc_df)
+
 
 avg_high_fourier_df.plot(
     title="Accuracy Without High Frequency Features",

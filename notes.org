@@ -136,19 +136,23 @@ that are concentrated in the low frequency domain. *The two*
 - [X] 6 seeds for each experiments:
   - [X] average results are presented.
 ***** TODO Contenu
-- [ ] Suprising results, contradiction to what Fourier perspective
+- [X] Suprising results, contradiction to what Fourier perspective
   reported
-- [ ] Show graph of reliance on low frequency features:
-  - [ ] Explain there is no clear winner, BUT the only noticeably 'better'
+- [X] Models trained with adamw are on top
+- [X] models without gaussian data augmentation rely more on low freq features
+- [-] Show graph of reliance on low frequency features:
+  - [X] Explain there is no clear winner, BUT the only noticeably 'better'
     are trained with Adamw.
-  - [ ] Gaussian is not better at all
+  - [X] Gaussian is not better at all
   - [ ] This goes against reported results of Fourier perspective:
     - [ ] Expected gaussian augmentation to have higher reliance than
-      others on low freq features
-- [ ] Show graph of reliance on high freq features: no obvious pattern
+
+- [ ] Show graph of reliance on high freq features: gaussian
+  augmentation rely MORE on igh freq
 - [ ] Create table proportion of reliance on frequencies!
   - [ ] Show spread on these data points: min max or std ?
-- [ ] establish relation between low freq reliance and test accuracy? 
+- [ ] establish relation between low freq reliance and test accuracy?
+- [ ] Low frequency accuracy relates more closely to test accuracy
 ***** TODO Conclusion
 - [ ] Our results do not support the results of yinfourier2020.
 **** TODO Gaussian augmentation 
@@ -159,7 +163,7 @@ that are concentrated in the low frequency domain. *The two*
   corruption we will always use this term on a relative scale.
   Gaussian noise is uniformly distributed across the Fourier
   frequencies and thus has much higher frequency statistics relative
-  to natural images
+  to natural images.
 ***** TODO Contenu
 - [ ] Gaussian augmentation did not rely more on low frequencies
 - [ ] Why?
