@@ -109,12 +109,13 @@ architecture. The lack of empirical research using different
 architectures and optimizers prompts the question:
 
 \textit{Does the architecture and the optimizer influence the bias
-  toward low frequency features in adversarially trained models and
-  models trained on Gaussian augmented datasets?}
+  toward low frequency features in models trained on Gaussian
+  augmented datasets?}
 
 Having an answer to this question could help us in selecting robust
 model for security sensitive applications or in building robust model
-without suffering the full cost of adversarial training.
+without suffering the full cost of adversarial training, by
+substituting adversarial training for Gaussian augmented training.
 \section{Preliminaries}
 We use the following notations:
 $\mathcal{F}: \mathbb{R}^{d_{1} \times d_{2}} \to
@@ -168,7 +169,7 @@ explanation does not hold in practice.
 
 Our goal is to determine whether optimizers and architecture influence
 the bias in feature selection of models trained with a Gaussian
-augmented dataset or adversarially trained. Previous works have tried
+augmented dataset. Previous works have tried
 to formalize the Fourier sensitivity of CNN, as explored by
 ~\citep{krishnamachari2023fourier}, and gave experimental insights
 regarding the tuning of models towards certain frequencies. This has
@@ -381,7 +382,8 @@ using adversarial training and to devise an experiment to explain why
 Gaussian augmentation bias models towards selecting high frequency
 features.
 
-The code is available in the following repository: https://github.com/SimonTheoret/FourierExp
+The code is available in the following repository:
+https://github.com/SimonTheoret/FourierExp
 % \section{General formatting instructions}
 % \label{gen_inst}
 
