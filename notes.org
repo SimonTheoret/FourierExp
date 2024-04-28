@@ -146,18 +146,17 @@ that are concentrated in the low frequency domain. *The two*
   - [X] Gaussian is not better at all
   - [ ] This goes against reported results of Fourier perspective:
     - [ ] Expected gaussian augmentation to have higher reliance than
-
-- [ ] Show graph of reliance on high freq features: gaussian
+- [X] Show graph of reliance on high freq features: gaussian
   augmentation rely MORE on igh freq
-- [ ] Create table proportion of reliance on frequencies!
-  - [ ] Show spread on these data points: min max or std ?
-- [ ] establish relation between low freq reliance and test accuracy?
-- [ ] Low frequency accuracy relates more closely to test accuracy
+- [X] Create table proportion of reliance on frequencies!
+  - [X] Show spread on these data points: min max or std ?
+- [X] establish relation between low freq reliance and test accuracy?
+- [X] Low frequency accuracy relates more closely to test accuracy
 ***** TODO Conclusion
-- [ ] Our results do not support the results of yinfourier2020.
+- [X] Our results do not support the results of yinfourier2020.
 **** TODO Gaussian augmentation 
 ***** TODO Contexte
-- [ ] The intuitive explanation supporting the use of gaussian data
+- [X] The intuitive explanation supporting the use of gaussian data
   augmentation is: Natural images have higher concentrations in low
   frequencies, thus when we refer to a “high” or “low” frequency
   corruption we will always use this term on a relative scale.
@@ -165,9 +164,9 @@ that are concentrated in the low frequency domain. *The two*
   frequencies and thus has much higher frequency statistics relative
   to natural images.
 ***** TODO Contenu
-- [ ] Gaussian augmentation did not rely more on low frequencies
-- [ ] Why?
-  - [ ] Gaussian noise is distributed uniformly in the frequency
+- [X] Gaussian augmentation did not rely more on low frequencies
+- [-] Why?
+  - [X] Gaussian noise is distributed uniformly in the frequency
     domain. Therefore, for a model 'naturally' more relying on low
     frequency features will suffer more when the quality of features
     in the low freq goes down. It learn to be able to use high freq?
@@ -175,20 +174,21 @@ that are concentrated in the low frequency domain. *The two*
     average* (because white noise)
   - [ ] Lower frequencies are more concentrated. Any corruption can be
     felt more harshly
-  - [ ] Visualize images of fourier transform (average over cifar test)
-  - [ ] Visualize distribution of gaussian noise in fourier transform space
+  - [X] Visualize images of fourier transform (average over cifar test)
+  - [X] Visualize distribution of gaussian noise in fourier transform space
 ***** TODO Conclusion
 - [ ] Gaussian augmentation is no bueno
 - [ ] Experimentally: does not work. There is too much information in
   high frequency.
 *** TODO Conclusion
 **** TODO Contexte
-- [ ] Summary of experiments
-- [ ] Their results about gaussian data augmentation bias might be an
+- [X] Summary of experiments
+- [X] Their results about gaussian data augmentation bias might be an
   artifact of their model/optimizer.
 **** TODO Contenu
-- [ ] What we showed
+- [X] What we showed
 - [ ] How does it compare to the original paper
+- [ ] Why gaussian no werk ???
 - [ ] Broader impact
 **** TODO Conclusion
 - [ ] Limitations

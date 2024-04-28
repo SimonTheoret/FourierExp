@@ -308,10 +308,11 @@ some relevant information contained in the higher frequencies of an
 image. Therefore, the added noise does not necessarily mean the model
 will learn to ignore the high frequency features. To back our
 hypothesis, we have computed the average frequencies values over the
-test set, with and without Gaussian augmentation:
+test set, without Gaussian augmentation. Figure
+\ref{fig:fouriervanillafreq} expose how much information is still
+contained in the higher frequencies.
 
-
-\begin{figure}[h]
+\begin{figure}[h!]
   \centering
   % \begin{subfigure}[b]{0.45\textwidth}
   % \centering
@@ -326,13 +327,50 @@ test set, with and without Gaussian augmentation:
   \caption{Average frequencies of test set without any Gaussian
     augmentation. Although the lower frequencies prime over the higher
     ones, an important proportion of a CIFAR10 image will still be
-    mapped to high frequencies}
+    mapped to high frequencies. Frequencies were scaled with the
+    $\log_{10}$ function to show the difference of scale. }
 	\label{fig:fouriervanillafreq}
 	% \end{subfigure}
 \end{figure}
+Finally, we can notice that the cross shaped pattern centered in the
+middle of the image is still visible, even with Gaussian augmentation:
+\begin{figure}[h!]
+  \centering \includegraphics[scale =
+    0.7]{assets/freq\_fourier\_transf\_gaussian.png}
+  \caption{Average frequencies of test set with Gaussian data
+    augmentation.}
+	\label{fig:fouriergaussianfreq}
+\end{figure}
+This gives an intuition as to why the explanation given in the
+~\citep{yin2020fourier} did not hold in our experiments: because the
+high frequencies are still distinguishable, models can still learn to
+extract features out of the high frequency components and rely on
+them.
+
+\section{Experiments Limitations}
+Our experiments were limited by three main factors. First, we filtered
+out frequencies with a single bandwidth $B=4$, limiting the generality
+of our results. Next, by filtering the frequencies with a square with
+side's length $B$, we did not fully cover the high frequencies, as
+they are not distributed the same way as low frequencies over the
+image. This means that we are not filtering in the exact same way the
+features of high or low frequencies. Finally, CIFAR10 is a small
+dataset of 32 pixels images. Due to their small size, these images
+might not have the full extent of frequencies encountered in high
+quality images. This last factor, if true, could explain why models
+were so reliant on low frequency features.
 
 \section{Conclusion}
-
+We tried to generalize the observations of ~\citep{yin2020fourier}.
+We conducted experiments with two different model, optimizers and
+training regiment to see which of these factors had an impact on the
+frequency bias of these models. The optimizer used and the training
+regimen were the main factors biasing the models toward certain range
+of frequencies. Our results are in stark contrast of what was reported
+in the Fourier perspective paper and shows how the intersection of
+harmonic analysis and computere vision is far to be fully
+understood. An interesting avenue of research would be to observe the
+behavior of the bias when using adversarial training.
 % \section{General formatting instructions}
 % \label{gen_inst}
 
