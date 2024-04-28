@@ -191,7 +191,7 @@ that are concentrated in the low frequency domain. *The two*
 - [ ] Why gaussian no werk ???
 - [ ] Broader impact
 **** TODO Conclusion
-- [ ] Limitations
-- [ ] Future works
+- [X] Limitations
+- [X] Future works
 ** TODO Remove every mention of adversarial training 
 ** TODO Explain why no adv 

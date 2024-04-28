@@ -333,7 +333,8 @@ contained in the higher frequencies.
 	% \end{subfigure}
 \end{figure}
 Finally, we can notice that the cross shaped pattern centered in the
-middle of the image is still visible, even with Gaussian augmentation:
+middle of the image is still visible, even with Gaussian augmentation,
+as in figure \ref{fig:fouriergaussianfreq}
 \begin{figure}[h!]
   \centering \includegraphics[scale =
     0.7]{assets/freq\_fourier\_transf\_gaussian.png}
@@ -366,11 +367,17 @@ We conducted experiments with two different model, optimizers and
 training regiment to see which of these factors had an impact on the
 frequency bias of these models. The optimizer used and the training
 regimen were the main factors biasing the models toward certain range
-of frequencies. Our results are in stark contrast of what was reported
-in the Fourier perspective paper and shows how the intersection of
-harmonic analysis and computere vision is far to be fully
-understood. An interesting avenue of research would be to observe the
-behavior of the bias when using adversarial training.
+of frequencies. We also showed why their explanation of why Gaussian
+augmentation results in a bias toward low frequency is unlikely to
+hold.
+
+Our results are in stark contrast of what was reported in the Fourier
+perspective paper and shows how the intersection of harmonic analysis
+and computere vision is far to be fully understood. An interesting
+avenue of research would be to observe the behavior of the bias when
+using adversarial training and to devise an experiment to explain why
+Gaussian augmentation bias models towards selecting high frequency
+features.
 % \section{General formatting instructions}
 % \label{gen_inst}
 
