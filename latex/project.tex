@@ -72,18 +72,19 @@
   questions about the bias of gradients towards low frequencies: Does
   the optimizer and the architecture of a model bias the model to rely
   on low frequency features. In this work, we investigate the impact
-  of Gaussian data augmentation and adversarial training on a
-  different set of architectures and optimizers. We provide an
-  hypothesis that gradients of adversarially trained models and models
+  of Gaussian data augmentation on a different set of architectures
+  and optimizers. We provide an hypothesis that gradients of models
   trained on Gaussian augmented data are naturally biased towards low
   frequency features, as they contain more relevant information for
   classification. To test our hypothesis, we provide an experimental
   protocol for testing our hypothesis against different architectures
   and optimizers by computing the accuracy of the trained models on
   images containing either high frequency features or low frequency
-  features. We show that... % TODO: Quickly describe findings + change
+  features. We show that the bias toward low or high frequencies
+  features is highly dependant of the optimizer and the training
+  regimen used.
 \end{abstract}
-% DONE: Change every copied citation into a real citation
+
 \section{Introduction}
 The Fourier perspective introduced by ~\citep{yin2020fourier} paved
 the way for exploring the Fourier space of images’ features and how
@@ -98,13 +99,13 @@ Neural Networks (CNN) in image classification. However, high frequency
 features are not robust, as shown by ~\citep{zhang2019interpreting}
 and yet models are often biased toward using these features. On the
 contrary, low frequency features, such as shape, are often the
-preferred features of adversarially trained neural networks or
-networks trained with a Gaussian augmented dataset. A bias toward
-shapes is not exclusive to computer vision models: it is well-known
-that object shape is the single most important cue for human object
-recognition, as discussed in ~\citep{landau}. The Fourier perspective
-article ~\citep{yin2020fourier} limited their experiments to the
-ResNet architecture. The lack of empirical research using different
+preferred features of neural networks trained with a Gaussian
+augmented dataset. A bias toward shapes is not exclusive to computer
+vision models: it is well-known that object shape is the single most
+important cue for human object recognition, as discussed in
+~\citep{landau}. The Fourier perspective article
+~\citep{yin2020fourier} limited their experiments to the ResNet
+architecture. The lack of empirical research using different
 architectures and optimizers prompts the question:
 
 \textit{Does the architecture and the optimizer influence the bias
@@ -160,10 +161,10 @@ perspective article.
 In the Fourier perspective article, the authors used a single model in
 their experiments. This factor limits the generality of their findings
 and raises the natural question: Are their results artifacts of the
-optimizer or the WideResNet architecture? By expanding the number of
-architecture optimizers used for training and testing, we show that
-\textbf{insert results here}, which is \textbf{in accord or not} with
-the Fourier perspective results.
+optimizer or the WideResNet architecture they used? By expanding the
+number of architecture and optimizers used for training and testing,
+we show that their previous findings do not seem to hold and why their
+explanation does not hold in practice.
 
 Our goal is to determine whether optimizers and architecture influence
 the bias in feature selection of models trained with a Gaussian
@@ -176,9 +177,8 @@ been explored in the works of ~\citep{krishnamachari2023fourier},
 ~\citep{mo2022adversarial}. Notably, the works of
 ~\citep{park2022vision} demonstrated that multi-headed
 self-attentions, such as ViT (vision transformers) models, reduce high
-frequency signals, while CNN amplify them. Here, we are showing that
-the results of ~\citep{yin2020fourier} are \textbf{ARE WHAT} of the
-architecture and the optimizer.
+frequency signals, while CNN amplify them. Here, we are exploring more
+closely the relation between accuracy and the frequency of features.
 
 \section{Experimental protocol}
 We are planning on using two different architectures for our
@@ -189,32 +189,29 @@ modules into a CNN architecture, as described by
 ~\citep{mehta2022mobilevit}. We opted not to include pure ViT models,
 due to their high computational demands.
 
-Our experiments consist of training a total of 12 models on the
-CIFAR10 dataset and evaluating the performance on the validation set
-with only high frequency features or low frequency features. For both
-the CNN and ViT architectures, each are trained on the default CIFAR10
-dataset, adversarially trained on the MNIST dataset and trained on the
-MNIST dataset with Gaussian augmentation. This procedure is repeated
-with two different optimizers. The stochastic gradient descent with
-momentum and AdamW optimizers will be used in training, as these
-optimizers were used in the original training of ALL-CNN and MobileViT
-models.
+Our experiments consist of training a total of 8 models on the CIFAR10
+dataset and evaluating the performance on the test set with only high
+frequency features or low frequency features. For both the CNN and ViT
+architectures, each are trained on the default CIFAR10 dataset and
+trained on the CIFAR10 dataset with Gaussian augmentation. This
+procedure is repeated with two different optimizers. The stochastic
+gradient descent with momentum and AdamW optimizers will be used in
+training, as these optimizers were used in the original training of
+ALL-CNN and MobileViT models.
 
 \subsection*{Hyperparameters}
 Here we document our chosen set of hyperparameters, used during our
-experiments. When training with the SGD algorithm, we used a learning
-rate of 0.01, whereas we used a learning rate of 0.001 when training
-with AdamW. Each experiment was a duration of 105 epochs and the
-results were averaged over 6 different seeds. We used a bandwitdth $B$
-of length 4 to filter the high and low frequencies. This is to say we
+experiments. When training with the SGD with momentum algorithm, we
+used a momentum coefficient of 0.9 and a learning rate of 0.01,
+whereas we used a learning rate of 0.001 when training with
+AdamW. Each experiment was a duration of 105 epochs and the results
+were averaged over 6 different seeds. We used a bandwitdth $B$ of
+length 4 to filter the high and low frequencies. This is to say we
 covered the center of the fourier transform of the images with a
 square with side of length 4. Each models were trained with the
 cross-entropy loss function. When applying Gaussian data augmentation,
 we used $\bar{\sigma} = 0.1$, which was the reported value in the
-Fourier perspective article. For adversarial training, we used
-$\varepsilon = 8/255$ coupled with projected gradient descent
-(PGD). Our adversarial training used an attack step size of 2 with a
-maximum of 7 iterations.
+Fourier perspective article.
 
 Intuitively, this protocol allows us to test the sensibility models
 and optimizers to low and high frequencies features and observe how
@@ -227,7 +224,7 @@ experiments. Although both high frequencies and low frequencies
 features are useful for classification, not every model and optimizer
 treat these frequencies the same way. We obtain conflicting and
 perhaps surprising results with what was reported in the Fourier
-perspective paper ~\citep{yin2020fourier}.
+perspective paper of ~\citep{yin2020fourier}.
 
 \subsection{Architecture and optimizer comparison}
 Here, we show our results with the AdamW and SGD optimizers, the
@@ -244,14 +241,16 @@ trained in a regular fashion. The results for the testing accuracy can
 be found in the appendix \ref{fig:testacc}.
 
 \subsubsection*{AdamW relies more on low frequency features}
-Surprisingly, the model's architecture does not seem to be a
-significant factor in predicting the behavior during training.
-However, we can notice how models trained with AdamW relied on low
-frequency features at least as much as models trained with stochastic
-gradient descent. This is in accordance to the experimental
-observations that AdamW often selects more generalizable features than
-its SGD counterpart, and that low frequency features are often useful
-features for generalization.
+The training behavior are shown at figure
+\ref{fig:higherror}. Surprisingly, the model's architecture does not
+seem to be a significant factor in predicting the behavior during
+training.  However, we can notice how models trained with AdamW relied
+on low frequency features at least as much as models trained with
+stochastic gradient descent, and two out of 4 models trained with
+AdamW surpass their SGD counterpart. This is in accordance to the
+experimental observations that AdamW often selects more generalizable
+features than its SGD counterpart, and that low frequency features are
+often useful features for generalization.
 
 \begin{figure}[h]
   \centering
@@ -268,15 +267,15 @@ features for generalization.
 Contrary to the reported results of the Fourier perspective paper,
 every model trained with Gaussian data augmentation relied less on low
 frequency features than it's vanilla counterpart. In fact, models
-trained under the Gaussian augmentation regimen were most prone to
+trained under the Gaussian augmentation regimen were the most prone to
 using high frequency features, as is shown in the figure
-\ref{fig:lowerror}. In fact, models trained under a standard regimen
+\ref{fig:lowerror}. Models trained under a standard regimen
 did not learn to use high frequency features: most of their
 performance is similar to the performance of a random classifier. On
 the opposite, ViT models with Gaussian augmented data achieved nearly
 27\% accuracy, and most models achieving over 20\% accuracy. This
 shows that models trained with Gaussian augmentation are not less
-reliant on high frequency features, but in fact are more reliant on
+reliant on high frequency features, but are in fact are more reliant on
 these high frequency features.
 
 \begin{figure}[h!]
@@ -289,15 +288,18 @@ these high frequency features.
 \end{figure}
 
 Overall, our result are in stark contrast to what
-~\citep{yin2020fourier} reported in their paper.
+~\citep{yin2020fourier} reported in their paper. The next section will
+try to explain why their explanation as to why Gaussian augmentation
+is biased toward low frequencies does not hold in practice.
 
 \subsection{Gaussian data augmentation}
 In the Fourier perspective paper, the authors explain why they believe
 Gaussian augmentation makes models rely more heavily on low frequency
-features. They hypothesize, that because natural images have higher
+features. They hypothesize that, because natural images have higher
 concentrations in the low frequencies and Gaussian noise is uniformly
 distributed across the Fourier frequencies and thus has much higher
-frequency statistics relative to natural images. Therefore, the added
+frequency statistics relative to natural images, the model will be
+invariant with respect to high frequency features. Therefore, adding
 noise will make the model invariant with respect to the high
 frequencies. In our case, this explanation does not seem to hold, as
 stated in the previous section.
@@ -348,7 +350,7 @@ high frequencies are still distinguishable, models can still learn to
 extract features out of the high frequency components and rely on
 them.
 
-\section{Experiments Limitations}
+\section{Experiments limitations}
 Our experiments were limited by three main factors. First, we filtered
 out frequencies with a single bandwidth $B=4$, limiting the generality
 of our results. Next, by filtering the frequencies with a square with
@@ -378,6 +380,8 @@ avenue of research would be to observe the behavior of the bias when
 using adversarial training and to devise an experiment to explain why
 Gaussian augmentation bias models towards selecting high frequency
 features.
+
+The code is available in the following repository: https://github.com/SimonTheoret/FourierExp
 % \section{General formatting instructions}
 % \label{gen_inst}
 
